@@ -1,0 +1,129 @@
+{
+  "_about": "Reviewed corrections to the largest lake of a region. 'excludeItems' lists Wikidata items with a wrong area, former lakes, salt flats and sea lagoons, so that the next lake is used. 'skipFactbook' lists Factbook entries that are sea lagoons. A region key holds a replacement lake, or null when the region has no lake.",
+  "excludeItems": {
+    "Q12314793": "Gødstrup Lake: area entered as 1,718 km²",
+    "Q35703516": "Guhkesjávri: area entered as 1,572 km²",
+    "Q6664986": "Loch Muick: area entered as 540 km²",
+    "Q107517904": "Montejaque reservoir: area entered as 1,780 km²",
+    "Q2406225": "Juyan Lake: the 10,000 km² area is a former extent",
+    "Q13700": "Lake Texcoco: a drained former lake",
+    "Q1412494": "Lake Ptolemy: a former Holocene lake",
+    "Q2013950": "Gowd-e Zerah: a basin that is usually dry",
+    "Q1860815": "Salar de Coipasa: a salt flat",
+    "Q1130771": "Syvash: a lagoon of the Sea of Azov",
+    "Q76925": "Venetian Lagoon: a lagoon of the Adriatic Sea",
+    "Q17215490": "Rock Islands Southern Lagoon: a sea lagoon",
+    "Q6497630": "Lau Lagoon: a sea lagoon",
+    "Q1425651": "Kyiv Reservoir: almost all of it is in Ukraine",
+    "Q753441": "Lake Atanasovsko: the 72 km² area includes the reserve",
+    "Q11726628": "Jezioro Oleckie Wielkie: area entered as 205 km²",
+    "Q1553876": "Mar Menor: a lagoon of the Mediterranean Sea",
+    "Q2045081": "Braslau Lakes: a group of lakes, not one lake",
+    "Q207690": "Poyang Lake: 5,100 km² is the flood peak, and the dry-season lake is much smaller"
+  },
+  "skipFactbook": [
+    "Stettiner Haff/Zalew Szczecinski",
+    "Zalew Szczecinski/Stettiner Haff",
+    "Curonian Lagoon",
+    "Laguna de Chiriqui",
+    "Laguna de Terminos",
+    "Lagune Aby",
+    "Laguna de Caratasca"
+  ],
+  "AFG": {
+    "name": "Ab-e Istada",
+    "km2": 520,
+    "kind": "salt lake",
+    "source": "The World Factbook"
+  },
+  "ATA": {
+    "name": "Lake Vostok",
+    "km2": 14000,
+    "kind": "subglacial lake",
+    "source": "Wikidata Q152044"
+  },
+  "BGD": {
+    "name": "Kaptai Lake",
+    "km2": 688,
+    "kind": "reservoir",
+    "source": "Wikipedia, Kaptai Lake"
+  },
+  "BLR": {
+    "name": "Lake Narach",
+    "km2": 79.2,
+    "source": "Wikidata Q747554"
+  },
+  "CIV": {
+    "name": "Lake Kossou",
+    "km2": 1740,
+    "kind": "reservoir",
+    "source": "FAO, full supply level"
+  },
+  "DJI": {
+    "name": "Lake Abbe",
+    "km2": 780,
+    "kind": "salt lake",
+    "shared": [
+      "Ethiopia"
+    ],
+    "source": "The World Factbook"
+  },
+  "KOR": {
+    "name": "Chungju Lake",
+    "km2": 66.5,
+    "kind": "reservoir",
+    "source": "Area submerged by Chungju Dam"
+  },
+  "LKA": {
+    "name": "Senanayake Samudraya",
+    "km2": null,
+    "kind": "reservoir",
+    "source": "Sri Lanka Irrigation Department: largest reservoir; no area published"
+  },
+  "MLI": {
+    "name": "Lake Sélingué",
+    "km2": 409,
+    "kind": "reservoir",
+    "source": "Wikidata Q2723824. Lac Faguibine is often dry."
+  },
+  "MMR": {
+    "name": "Indawgyi Lake",
+    "km2": 120,
+    "source": "Indawgyi Lake site: 12,000 ha of open water"
+  },
+  "MYS": {
+    "name": "Kenyir Lake",
+    "km2": 260,
+    "kind": "reservoir",
+    "source": "Wikipedia, Kenyir Lake"
+  },
+  "PHL": {
+    "name": "Laguna de Bay",
+    "km2": 890,
+    "source": "The World Factbook (a freshwater lake)"
+  },
+  "PRT": {
+    "name": "Alqueva Reservoir",
+    "km2": 250,
+    "kind": "reservoir",
+    "shared": [
+      "Spain"
+    ],
+    "source": "EDIA, full level in 2010"
+  },
+  "SRB": {
+    "name": "Đerdap Lake",
+    "km2": 253,
+    "kind": "reservoir",
+    "shared": [
+      "Romania"
+    ],
+    "source": "List of lakes of Serbia"
+  },
+  "SYR": {
+    "name": "Lake Assad",
+    "km2": 610,
+    "kind": "reservoir",
+    "source": "Wikipedia, Lake Assad (maximum area)"
+  }
+}

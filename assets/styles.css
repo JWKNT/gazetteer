@@ -1,0 +1,263 @@
+/* Gazetteer: a globe with a country card. Shared tokens come from site-theme v2. */
+:root {
+  --card-width: 25rem;
+  /* Globe colors. The script reads these, so the globe follows the color mode. */
+  --globe-water: #e2e9ef;
+  --globe-land: #fbfaf7;
+  --globe-border: #a8a195;
+  --globe-coast: #77736c;
+  --globe-grid: #d3d9de;
+  --globe-limb: rgb(24 24 23 / 9%);
+}
+:root[data-theme="dark"] {
+  --globe-water: #10171d;
+  --globe-land: #25261f;
+  --globe-border: #5f6058;
+  --globe-coast: #9a958c;
+  --globe-grid: #1d262d;
+  --globe-limb: rgb(0 0 0 / 45%);
+}
+
+.atlas, .sources, .site-footer {
+  width: var(--site-frame-width, min(74rem, calc(100% - 5rem)));
+  margin-inline: auto;
+}
+
+/* Controls sit directly above the globe they change. */
+.atlas-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: .65rem 1rem;
+  padding-top: 1.1rem;
+}
+
+.country-field { width: min(19rem, 100%); }
+.country-field select { width: 100%; }
+
+.view-controls { display: flex; }
+.view-controls button {
+  min-width: var(--control-size, 2.25rem);
+  min-height: var(--control-size, 2.25rem);
+  padding: .3rem .6rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: var(--text-ui, .875rem)/1.4 var(--ui, var(--serif));
+}
+.view-controls button + button { margin-left: -1px; }
+.view-controls button[data-zoom] { font: 1.05rem/1 var(--mono); }
+.view-controls button:focus-visible { position: relative; z-index: 1; }
+
+.globe-status {
+  flex: 1 1 12rem;
+  margin: 0;
+  color: var(--muted);
+  font: var(--text-ui, .875rem)/1.4 var(--ui, var(--serif));
+  text-align: right;
+}
+
+/* The stage keeps the globe in the first viewport on wide and narrow screens. */
+.globe-stage {
+  position: relative;
+  height: clamp(20rem, calc(100vh - 12rem), 50rem);
+  height: clamp(20rem, calc(100svh - 12rem), 50rem);
+  margin-top: .75rem;
+}
+
+#globe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+#globe.is-dragging { cursor: grabbing; }
+#globe.is-pointing { cursor: pointer; }
+#globe:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+.globe-hover, .city-label {
+  position: absolute;
+  z-index: 3;
+  margin: 0;
+  padding: .15rem .45rem;
+  border: 1px solid var(--line-strong);
+  background: var(--paper);
+  color: var(--ink);
+  font: var(--text-ui, .875rem)/1.35 var(--ui, var(--serif));
+  white-space: nowrap;
+  pointer-events: none;
+}
+.city-label { font-size: var(--text-meta, .75rem); }
+
+.globe-help {
+  max-width: 72ch;
+  margin: .6rem 0 0;
+  color: var(--muted);
+  font: var(--text-ui, .875rem)/1.6 var(--ui, var(--serif));
+}
+
+/* The country card: a non-modal dialog beside the globe. */
+.country-card {
+  position: absolute;
+  inset: .5rem 0 auto auto;
+  z-index: 4;
+  display: none;
+  flex-direction: column;
+  width: min(var(--card-width), 100%);
+  max-height: calc(100% - 1rem);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: var(--paper);
+  color: var(--ink);
+}
+.country-card[open] { display: flex; }
+
+.card-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .85rem .5rem .6rem 1.1rem;
+  border-bottom: 1px solid var(--line);
+}
+.card-head h2 {
+  margin: .2rem 0 0;
+  font: 700 clamp(1.3rem, 2.2vw, 1.6rem)/1.15 var(--display);
+  letter-spacing: -.012em;
+  overflow-wrap: anywhere;
+}
+.card-head h2:focus { outline: none; }
+.card-head h2:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+.card-close {
+  display: grid;
+  flex: none;
+  width: var(--control-size, 2.25rem);
+  min-height: var(--control-size, 2.25rem);
+  padding: 0;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted-strong);
+  font: 1.35rem/1 var(--serif);
+}
+.card-close:hover:not(:disabled) { border-color: var(--line-strong); background: var(--surface); color: var(--ink); }
+
+.card-body {
+  padding: .35rem 1.1rem 1rem;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.card-note, .card-empty, .card-sources, .fact-note {
+  color: var(--muted);
+  font: var(--text-meta, .75rem)/1.5 var(--ui, var(--serif));
+}
+.card-note { margin: .35rem 0 .1rem; }
+.card-empty { margin: .2rem 0 0; font-size: var(--text-ui, .875rem); }
+.card-sources { margin: 1rem 0 0; padding-top: .6rem; border-top: 1px solid var(--line); }
+.card-sources a { color: inherit; }
+
+.card-facts {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, auto) minmax(0, 1fr);
+  gap: 0 .9rem;
+  margin: .25rem 0 0;
+}
+.card-facts dt, .card-facts dd {
+  padding: .45rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.card-facts dt {
+  color: var(--muted);
+  font: var(--text-ui, .875rem)/1.45 var(--ui, var(--serif));
+}
+.card-facts dd {
+  margin: 0;
+  font: var(--text-ui, .875rem)/1.45 var(--serif);
+  overflow-wrap: anywhere;
+}
+.card-facts > :nth-last-child(-n + 2) { border-bottom: 0; }
+.fact-value { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fact-note { display: block; margin-top: .1rem; }
+
+.card-year {
+  margin-left: .3rem;
+  color: var(--muted);
+  font: 400 var(--text-meta, .75rem)/1 var(--mono);
+}
+
+.card-section h3 {
+  margin: 1rem 0 .35rem;
+  padding-top: .75rem;
+  border-top: 1px solid var(--line-strong);
+  font: 700 1rem/1.3 var(--display);
+}
+
+.export-list {
+  margin: 0;
+  padding-left: 1.6rem;
+  font: var(--text-ui, .875rem)/1.6 var(--serif);
+}
+.export-list li::marker { color: var(--muted); font-family: var(--mono); font-size: var(--text-meta, .75rem); }
+
+.city-table { width: 100%; font-size: var(--text-ui, .875rem); }
+.city-table th, .city-table td { padding: .3rem .4rem; }
+.city-table th:first-child, .city-table td:first-child { width: 1.8rem; padding-left: 0; color: var(--muted); font: var(--text-meta, .75rem)/1.6 var(--mono); }
+.city-table th { font-weight: 600; }
+.city-table .num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.city-table td.year { color: var(--muted); font-size: var(--text-meta, .75rem); }
+.city-table th.num { font-family: var(--ui, var(--serif)); }
+.city-table th:last-child, .city-table td:last-child { padding-right: 0; }
+.city-table tbody tr { cursor: default; }
+.city-table tbody tr.is-active { background: var(--surface-blue); }
+.city-table tbody tr:last-child td { border-bottom: 0; }
+
+/* Sources: a reading measure, one rule per entry. */
+.sources { padding: 0 0 1rem; }
+.sources > .site-divider { margin-block: clamp(2rem, 5vw, 3.25rem) 1.5rem; }
+.sources h2 { margin: 0 0 .75rem; font-weight: 700; }
+.source-list { max-width: 72ch; margin: 0; }
+.source-list > div { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: .25rem 1.25rem; padding: .7rem 0; border-top: 1px solid var(--line); }
+.source-list dt { font-weight: 700; }
+.source-list dd { margin: 0; color: var(--muted-strong); line-height: 1.6; }
+.sources-date { color: var(--muted); font: var(--text-meta, .75rem)/1.5 var(--ui, var(--serif)); }
+
+.site-footer a { color: inherit; }
+.noscript { color: var(--muted); }
+
+/* On a narrow screen the card is a sheet at the bottom of the viewport. */
+@media (max-width: 42rem) {
+  .globe-status { flex-basis: 100%; text-align: left; }
+  .globe-stage { height: min(calc(100vw - 1rem), 68vh); height: min(calc(100vw - 1rem), 68svh); }
+  .country-card {
+    position: fixed;
+    inset: auto 0 0 0;
+    width: 100%;
+    max-height: 50vh;
+    max-height: 50svh;
+    border-width: 1px 0 0;
+  }
+  .card-head { padding-left: 1rem; }
+  .card-body { padding-inline: 1rem; padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+  .source-list > div { grid-template-columns: 1fr; }
+}
+
+@media (pointer: coarse) {
+  .card-close { width: 2.75rem; min-height: 2.75rem; }
+}
+
+@media print {
+  .atlas-tools, .globe-help, .card-close { display: none !important; }
+  .globe-stage { height: auto; }
+  #globe { display: none; }
+  .country-card[open] { position: static; width: 100%; max-height: none; border: 0; }
+  .card-body { overflow: visible; }
+}

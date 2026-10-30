@@ -1,0 +1,23 @@
+{
+  "_about": "Corrections to elevation extremes parsed from The World Factbook. Each value replaces the parsed point. Names describe unnamed points by place.",
+  "ARG": { "highest": { "name": "Cerro Aconcagua", "m": 6961 } },
+  "ATA": { "lowest": { "name": "Denman Glacier trough, under the ice", "m": -3500 } },
+  "BHS": { "highest": { "name": "Unnamed point on Cat Island", "m": 64 } },
+  "BEN": { "highest": { "name": "Unnamed point near Kotopounga", "m": 675 } },
+  "BDI": { "highest": { "name": "Unnamed point on the Mukike Range", "m": 2685 } },
+  "CYM": { "highest": { "name": "Unnamed point on Cayman Brac", "m": 50 } },
+  "GMB": { "highest": { "name": "Unnamed point near Sabi", "m": 63 } },
+  "KIR": { "highest": { "name": "Unnamed point on Banaba", "m": 81 } },
+  "KWT": { "highest": { "name": "Unnamed point near the Al-Salmi border post", "m": 300 } },
+  "MDV": { "highest": { "name": "Golf course on Villingi Island", "m": 5 } },
+  "MSR": { "highest": { "name": "Soufrière Hills lava dome (2015 estimate)", "m": 1050 } },
+  "NIU": { "highest": { "name": "Unnamed point near Hikutavake", "m": 80 } },
+  "SEN": { "highest": { "name": "Unnamed point near Nepen Diaka", "m": 648 } },
+  "SXM": { "highest": { "name": "Slope of Mount Flagstaff", "m": 383 } },
+  "TCA": { "highest": { "name": "Blue Hill (Providenciales) and Flamingo Hill (East Caicos)", "m": 48 } },
+  "TUV": { "highest": { "name": "Unnamed point", "m": 5 } },
+  "ESH": { "highest": { "name": "Unnamed point", "m": 805 } },
+  "USA": { "highest": { "name": "Denali (Mount McKinley)", "m": 6190 } },
+  "FRA": { "lowest": { "name": "Rhône River delta", "m": -2 } },
+  "PAK": { "highest": { "name": "K2", "m": 8611 } }
+}

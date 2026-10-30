@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A globe of the world’s countries. Select a country to see its most populous cities, highest and lowest points, largest lake, main exports, GDP and official languages.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Gazetteer">
+    <meta property="og:description" content="A globe of the world’s countries, with reference data for each one.">
+    <meta property="og:url" content="https://jehlp.net/gazetteer/">
+    <meta property="og:site_name" content="jehlp.net">
+    <meta name="twitter:card" content="summary">
+    <meta name="theme-color" content="#fbfaf7">
+    <link rel="canonical" href="https://jehlp.net/gazetteer/">
+    <title>Gazetteer · jehlp.net</title>
+    <link rel="icon" href="assets/favicon.png" type="image/png">
+    <script src="https://jehlp.net/site-theme/v2/theme.js?v=20261009-reading-folio"></script>
+    <link rel="stylesheet" href="https://jehlp.net/site-theme/v2/base.css?v=20261009-reading-folio">
+    <link rel="stylesheet" href="https://jehlp.net/site-theme/v2/components.css">
+    <script src="https://jehlp.net/site-theme/v2/components.js" defer></script>
+    <link rel="stylesheet" href="assets/styles.css?v=20261030">
+    <script src="assets/vendor/d3-array.min.js" defer></script>
+    <script src="assets/vendor/d3-geo.min.js" defer></script>
+    <script src="assets/vendor/topojson-client.min.js" defer></script>
+    <script src="assets/app.js?v=20261030" defer></script>
+  </head>
+  <body data-site-tone="teal">
+    <a class="skip-link" href="#country-select">Skip to the country list</a>
+
+    <header class="site-header site-header--identity">
+      <div class="site-brand"><img class="site-mark" src="assets/mark.png" width="32" height="32" alt=""><h1 class="site-title">Gazetteer</h1></div>
+      <nav aria-label="Page links">
+        <a href="#sources">Sources</a>
+        <span class="site-utility-pair">
+          <a class="site-home" href="https://jehlp.net/" aria-label="Home — jehlp.net" title="Home — jehlp.net"><span aria-hidden="true">✳</span></a>
+          <button class="theme-toggle" type="button" data-theme-toggle aria-label="Use dark theme"></button>
+        </span>
+      </nav>
+    </header>
+
+    <main id="main" class="atlas">
+      <div class="atlas-tools">
+        <label class="ui-field country-field" for="country-select">Country
+          <select id="country-select" name="country" data-ui-select>
+            <option value="">Select a country</option>
+            <!-- countries:start -->
+            <option value="AFG">Afghanistan</option>
+            <option value="ALB">Albania</option>
+            <option value="DZA">Algeria</option>
+            <option value="ASM">American Samoa</option>
+            <option value="AND">Andorra</option>
+            <option value="AGO">Angola</option>
+            <option value="AIA">Anguilla</option>
+            <option value="ATA">Antarctica</option>
+            <option value="ATG">Antigua and Barbuda</option>
+            <option value="ARG">Argentina</option>
+            <option value="ARM">Armenia</option>
+            <option value="ABW">Aruba</option>
+            <option value="ATC">Ashmore and Cartier Islands</option>
+            <option value="AUS">Australia</option>
+            <option value="AUT">Austria</option>
+            <option value="AZE">Azerbaijan</option>
+            <option value="BHS">The Bahamas</option>
+            <option value="BHR">Bahrain</option>
+            <option value="BGD">Bangladesh</option>
+            <option value="BRB">Barbados</option>
+            <option value="BLR">Belarus</option>
+            <option value="BEL">Belgium</option>
+            <option value="BLZ">Belize</option>
+            <option value="BEN">Benin</option>
+            <option value="BMU">Bermuda</option>
+            <option value="BTN">Bhutan</option>
+            <option value="BOL">Bolivia</option>
+            <option value="BIH">Bosnia and Herzegovina</option>
+            <option value="BWA">Botswana</option>
+            <option value="BRA">Brazil</option>
+            <option value="IOT">British Indian Ocean Territory</option>
+            <option value="VGB">British Virgin Islands</option>
+            <option value="BRN">Brunei</option>
+            <option value="BGR">Bulgaria</option>
+            <option value="BFA">Burkina Faso</option>
+            <option value="BDI">Burundi</option>
+            <option value="CPV">Cabo Verde</option>
+            <option value="KHM">Cambodia</option>
+            <option value="CMR">Cameroon</option>
+            <option value="CAN">Canada</option>
+            <option value="CYM">Cayman Islands</option>
+            <option value="CAF">Central African Republic</option>
+            <option value="TCD">Chad</option>
+            <option value="CHL">Chile</option>
+            <option value="CHN">China</option>
+            <option value="CXR">Christmas Island</option>
+            <option value="CCK">Cocos (Keeling) Islands</option>
+            <option value="COL">Colombia</option>
+            <option value="COM">Comoros</option>
+            <option value="COK">Cook Islands</option>
+            <option value="CRI">Costa Rica</option>
+            <option value="CIV">Côte d’Ivoire</option>
+            <option value="HRV">Croatia</option>
+            <option value="CUB">Cuba</option>
+            <option value="CUW">Curaçao</option>
+            <option value="CYP">Cyprus</option>
+            <option value="CZE">Czechia</option>
+            <option value="COD">Democratic Republic of the Congo</option>
+            <option value="DNK">Denmark</option>
+            <option value="DJI">Djibouti</option>
+            <option value="DMA">Dominica</option>
+            <option value="DOM">Dominican Republic</option>
+            <option value="ECU">Ecuador</option>
+            <option value="EGY">Egypt</option>
+            <option value="SLV">El Salvador</option>
+            <option value="GNQ">Equatorial Guinea</option>
+            <option value="ERI">Eritrea</option>
+            <option value="EST">Estonia</option>
+            <option value="SWZ">Eswatini</option>
+            <option value="ETH">Ethiopia</option>
+            <option value="FLK">Falkland Islands</option>
+            <option value="FRO">Faroe Islands</option>
+            <option value="FJI">Fiji</option>
+            <option value="FIN">Finland</option>
+            <option value="FRA">France</option>
+            <option value="PYF">French Polynesia</option>
+            <option value="ATF">French Southern and Antarctic Lands</option>
+            <option value="GAB">Gabon</option>
+            <option value="GMB">The Gambia</option>
+            <option value="GEO">Georgia</option>
+            <option value="DEU">Germany</option>
+            <option value="GHA">Ghana</option>
+            <option value="GIB">Gibraltar</option>
+            <option value="GRC">Greece</option>
+            <option value="GRL">Greenland</option>
+            <option value="GRD">Grenada</option>
+            <option value="GUM">Guam</option>
+            <option value="GTM">Guatemala</option>
+            <option value="GGY">Guernsey</option>
+            <option value="GIN">Guinea</option>
+            <option value="GNB">Guinea-Bissau</option>
+            <option value="GUY">Guyana</option>
+            <option value="HTI">Haiti</option>
+            <option value="HMD">Heard Island and McDonald Islands</option>
+            <option value="HND">Honduras</option>
+            <option value="HKG">Hong Kong</option>
+            <option value="HUN">Hungary</option>
+            <option value="ISL">Iceland</option>
+            <option value="IND">India</option>
+            <option value="IDN">Indonesia</option>
+            <option value="IRN">Iran</option>
+            <option value="IRQ">Iraq</option>
+            <option value="IRL">Ireland</option>
+            <option value="IMN">Isle of Man</option>
+            <option value="ISR">Israel</option>
+            <option value="ITA">Italy</option>
+            <option value="JAM">Jamaica</option>
+            <option value="JPN">Japan</option>
+            <option value="JEY">Jersey</option>
+            <option value="JOR">Jordan</option>
+            <option value="KAZ">Kazakhstan</option>
+            <option value="KEN">Kenya</option>
+            <option value="KIR">Kiribati</option>
+            <option value="XKX">Kosovo</option>
+            <option value="KWT">Kuwait</option>
+            <option value="KGZ">Kyrgyzstan</option>
+            <option value="LAO">Laos</option>
+            <option value="LVA">Latvia</option>
+            <option value="LBN">Lebanon</option>
+            <option value="LSO">Lesotho</option>
+            <option value="LBR">Liberia</option>
+            <option value="LBY">Libya</option>
+            <option value="LIE">Liechtenstein</option>
+            <option value="LTU">Lithuania</option>
+            <option value="LUX">Luxembourg</option>
+            <option value="MAC">Macao</option>
+            <option value="MDG">Madagascar</option>
+            <option value="MWI">Malawi</option>
+            <option value="MYS">Malaysia</option>
+            <option value="MDV">Maldives</option>
+            <option value="MLI">Mali</option>
+            <option value="MLT">Malta</option>
+            <option value="MHL">Marshall Islands</option>
+            <option value="MRT">Mauritania</option>
+            <option value="MUS">Mauritius</option>
+            <option value="MEX">Mexico</option>
+            <option value="FSM">Micronesia</option>
+            <option value="MDA">Moldova</option>
+            <option value="MCO">Monaco</option>
+            <option value="MNG">Mongolia</option>
+            <option value="MNE">Montenegro</option>
+            <option value="MSR">Montserrat</option>
+            <option value="MAR">Morocco</option>
+            <option value="MOZ">Mozambique</option>
+            <option value="MMR">Myanmar</option>
+            <option value="NAM">Namibia</option>
+            <option value="NRU">Nauru</option>
+            <option value="NPL">Nepal</option>
+            <option value="NLD">Netherlands</option>
+            <option value="NCL">New Caledonia</option>
+            <option value="NZL">New Zealand</option>
+            <option value="NIC">Nicaragua</option>
+            <option value="NER">Niger</option>
+            <option value="NGA">Nigeria</option>
+            <option value="NIU">Niue</option>
+            <option value="NFK">Norfolk Island</option>
+            <option value="PRK">North Korea</option>
+            <option value="MKD">North Macedonia</option>
+            <option value="MNP">Northern Mariana Islands</option>
+            <option value="NOR">Norway</option>
+            <option value="OMN">Oman</option>
+            <option value="PAK">Pakistan</option>
+            <option value="PLW">Palau</option>
+            <option value="PSE">Palestine</option>
+            <option value="PAN">Panama</option>
+            <option value="PNG">Papua New Guinea</option>
+            <option value="PRY">Paraguay</option>
+            <option value="PER">Peru</option>
+            <option value="PHL">Philippines</option>
+            <option value="PCN">Pitcairn Islands</option>
+            <option value="POL">Poland</option>
+            <option value="PRT">Portugal</option>
+            <option value="PRI">Puerto Rico</option>
+            <option value="QAT">Qatar</option>
+            <option value="COG">Republic of the Congo</option>
+            <option value="ROU">Romania</option>
+            <option value="RUS">Russia</option>
+            <option value="RWA">Rwanda</option>
+            <option value="BLM">Saint Barthélemy</option>
+            <option value="SHN">Saint Helena, Ascension and Tristan da Cunha</option>
+            <option value="KNA">Saint Kitts and Nevis</option>
+            <option value="LCA">Saint Lucia</option>
+            <option value="MAF">Saint Martin</option>
+            <option value="SPM">Saint Pierre and Miquelon</option>
+            <option value="VCT">Saint Vincent and the Grenadines</option>
+            <option value="WSM">Samoa</option>
+            <option value="SMR">San Marino</option>
+            <option value="STP">São Tomé and Príncipe</option>
+            <option value="SAU">Saudi Arabia</option>
+            <option value="SEN">Senegal</option>
+            <option value="SRB">Serbia</option>
+            <option value="SYC">Seychelles</option>
+            <option value="KAS">Siachen Glacier</option>
+            <option value="SLE">Sierra Leone</option>
+            <option value="SGP">Singapore</option>
+            <option value="SXM">Sint Maarten</option>
+            <option value="SVK">Slovakia</option>
+            <option value="SVN">Slovenia</option>
+            <option value="SLB">Solomon Islands</option>
+            <option value="SOM">Somalia</option>
+            <option value="ZAF">South Africa</option>
+            <option value="SGS">South Georgia and the South Sandwich Islands</option>
+            <option value="KOR">South Korea</option>
+            <option value="SSD">South Sudan</option>
+            <option value="ESP">Spain</option>
+            <option value="LKA">Sri Lanka</option>
+            <option value="SDN">Sudan</option>
+            <option value="SUR">Suriname</option>
+            <option value="SWE">Sweden</option>
+            <option value="CHE">Switzerland</option>
+            <option value="SYR">Syria</option>
+            <option value="TWN">Taiwan</option>
+            <option value="TJK">Tajikistan</option>
+            <option value="TZA">Tanzania</option>
+            <option value="THA">Thailand</option>
+            <option value="TLS">Timor-Leste</option>
+            <option value="TGO">Togo</option>
+            <option value="TON">Tonga</option>
+            <option value="TTO">Trinidad and Tobago</option>
+            <option value="TUN">Tunisia</option>
+            <option value="TUR">Turkey</option>
+            <option value="TKM">Turkmenistan</option>
+            <option value="TCA">Turks and Caicos Islands</option>
+            <option value="TUV">Tuvalu</option>
+            <option value="VIR">U.S. Virgin Islands</option>
+            <option value="UGA">Uganda</option>
+            <option value="UKR">Ukraine</option>
+            <option value="ARE">United Arab Emirates</option>
+            <option value="GBR">United Kingdom</option>
+            <option value="USA">United States</option>
+            <option value="URY">Uruguay</option>
+            <option value="UZB">Uzbekistan</option>
+            <option value="VUT">Vanuatu</option>
+            <option value="VAT">Vatican City</option>
+            <option value="VEN">Venezuela</option>
+            <option value="VNM">Vietnam</option>
+            <option value="WLF">Wallis and Futuna</option>
+            <option value="ESH">Western Sahara</option>
+            <option value="YEM">Yemen</option>
+            <option value="ZMB">Zambia</option>
+            <option value="ZWE">Zimbabwe</option>
+            <!-- countries:end -->
+          </select>
+        </label>
+        <div class="view-controls" role="group" aria-label="Globe view">
+          <button type="button" data-zoom="-1" aria-label="Zoom out" title="Zoom out">−</button>
+          <button type="button" data-zoom="1" aria-label="Zoom in" title="Zoom in">+</button>
+          <button type="button" data-view="reset">Reset view</button>
+        </div>
+        <p class="globe-status" id="globe-status" role="status" aria-live="polite">Loading the globe…</p>
+      </div>
+
+      <div class="globe-stage" id="globe-stage">
+        <canvas id="globe" tabindex="0" role="img" aria-label="Globe of the world’s countries" aria-describedby="globe-help"></canvas>
+        <p class="globe-hover" id="globe-hover" aria-hidden="true" hidden></p>
+        <p class="city-label" id="city-label" aria-hidden="true" hidden></p>
+
+        <dialog class="country-card" id="country-card" aria-labelledby="card-title">
+          <div class="card-head">
+            <h2 id="card-title" tabindex="-1"></h2>
+            <button type="button" class="card-close" id="card-close" aria-label="Close country details">×</button>
+          </div>
+          <div class="card-body">
+            <p class="card-note" id="card-note" hidden></p>
+            <dl class="card-facts" id="card-facts"></dl>
+            <section class="card-section" aria-labelledby="exports-title">
+              <h3 id="exports-title">Main exports <span class="card-year" id="exports-year"></span></h3>
+              <ol class="export-list" id="export-list"></ol>
+              <p class="card-empty" id="exports-empty" hidden>No export data.</p>
+            </section>
+            <section class="card-section" aria-labelledby="cities-title">
+              <h3 id="cities-title">Most populous cities</h3>
+              <table class="city-table" id="city-table">
+                <thead><tr><th scope="col"><span class="sr-only">Rank</span></th><th scope="col">City</th><th scope="col" class="num">Population</th><th scope="col" class="num">Year</th></tr></thead>
+                <tbody id="city-rows"></tbody>
+              </table>
+              <p class="card-empty" id="cities-empty" hidden></p>
+            </section>
+            <p class="card-sources" id="card-sources"></p>
+          </div>
+        </dialog>
+      </div>
+
+      <p class="globe-help" id="globe-help">Drag the globe to turn it. Scroll or pinch to zoom. Click a country to see its data. When the globe has focus, use the arrow keys to turn it and + or − to zoom. Press Enter to open the country at the center.</p>
+      <noscript><p class="noscript">The globe needs JavaScript.</p></noscript>
+    </main>
+
+    <section id="sources" class="sources" aria-labelledby="sources-title">
+      <div class="site-divider" data-ornament="constellation" aria-hidden="true"><span></span></div>
+      <h2 id="sources-title">Sources and method</h2>
+      <dl class="source-list">
+        <div>
+          <dt>Boundaries</dt>
+          <dd>The boundaries come from the <a href="https://www.naturalearthdata.com/downloads/50m-cultural-vectors/50m-admin-0-countries-2/">Natural Earth</a> admin-0 countries at 1:50m. Gibraltar comes from the 1:10m set. Natural Earth shows the boundaries that are in effect. Dashed lines show disputed boundaries. A boundary on this map does not show recognition.</dd>
+        </div>
+        <div>
+          <dt>Cities</dt>
+          <dd><a href="https://www.geonames.org/">GeoNames</a> gives the candidate settlements. <a href="https://www.wikidata.org/">Wikidata</a> gives the most recent official population of each candidate, with its year. A figure without a year comes from GeoNames. A city is the municipality or city proper. Definitions differ between countries, so compare cities within one country. A review removes the districts of a larger city.</dd>
+        </div>
+        <div>
+          <dt>Elevation and exports</dt>
+          <dd>The values come from the final edition of <a href="https://github.com/factbook/factbook.json">The World Factbook</a>, January 2026. The Factbook gives the five largest export commodities by value. The list does not include services.</dd>
+        </div>
+        <div>
+          <dt>Lakes</dt>
+          <dd>The values come from The World Factbook and Wikidata. The largest lake is the largest body of standing water by area. Reservoirs and salt lakes are included. Lagoons of the sea, salt flats and former lakes are not. For a shared lake, the area is the area of the whole lake.</dd>
+        </div>
+        <div>
+          <dt>GDP</dt>
+          <dd>GDP is nominal, in current US dollars. The <a href="https://data.worldbank.org/indicator/NY.GDP.MKTP.CD">World Bank</a> gives the most recent year. The <a href="https://www.imf.org/external/datamapper/NGDPD@WEO">IMF World Economic Outlook</a> gives the figure for Taiwan and for countries where the World Bank figure is before 2023. The World Factbook gives the figure for most territories.</dd>
+        </div>
+        <div>
+          <dt>Official languages</dt>
+          <dd>The list gives the languages that are official at the national level. It comes from a review of The World Factbook and Wikidata. Where no law sets a language, the list gives the language in general use and says so.</dd>
+        </div>
+      </dl>
+      <p class="sources-date" id="sources-date"></p>
+    </section>
+
+    <footer class="site-footer">
+      <p>jehlp.net · Data: Natural Earth (public domain), GeoNames (CC BY 4.0), Wikidata (CC0), The World Factbook (public domain), World Bank (CC BY 4.0), IMF. · <a href="https://github.com/JWKNT/gazetteer">Source</a></p>
+    </footer>
+  </body>
+</html>
