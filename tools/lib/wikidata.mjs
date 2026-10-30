@@ -45,7 +45,8 @@ export async function api(params) {
       if (response.ok) {
         const data = await response.json();
         if (!data.error) return data;
-        throw new Error(`Wikidata API: ${data.error.info}`);
+        // A busy search index or a lagging server answers with an error. Try again later.
+        if (!/busy|lag|ratelimit/i.test(`${data.error.code} ${data.error.info}`)) throw new Error(`Wikidata API: ${data.error.info}`);
       }
     } catch (error) {
       if (String(error.message).startsWith('Wikidata API')) throw error;

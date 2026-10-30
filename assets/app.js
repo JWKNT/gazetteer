@@ -33,6 +33,9 @@
   let land = null;
   let lines = {};
   let coarse = null;
+  let lakeShapes = { map: null, byRegion: new Map() };
+  let marks = [];
+  let pointedMark = null;
   let moving = false;
   let settleTimer = 0;
   let colors = {};
@@ -60,6 +63,8 @@
       paper: token("--paper"),
       blue: token("--blue"),
       selection: mix(token("--blue"), dark ? 0.34 : 0.22),
+      lake: mix(token("--blue"), dark ? 0.8 : 0.62),
+      sans: token("--sans"),
       hover: mix(token("--ink"), dark ? 0.12 : 0.07),
       back: mix(token("--ink"), dark ? 0.22 : 0.17),
       backLand: mix(token("--ink"), dark ? 0.045 : 0.03),
@@ -157,6 +162,27 @@
     if (hovered && hovered !== selected) fillRegion(hovered, colors.hover);
     if (selected) fillRegion(selected, colors.selection);
 
+    // Large lakes are water on every view. The largest lake of the selected region is blue.
+    if (lakeShapes.map) {
+      const water = new Path2D();
+      d3.geoPath(projection, water)(lakeShapes.map);
+      context.fillStyle = colors.water;
+      context.fill(water);
+      context.lineWidth = 0.5;
+      context.strokeStyle = colors.coast;
+      context.stroke(water);
+    }
+    const selectedLake = selected && lakeShapes.byRegion.get(selected);
+    if (selectedLake) {
+      const lake = new Path2D();
+      d3.geoPath(projection, lake)(selectedLake);
+      context.fillStyle = colors.lake;
+      context.fill(lake);
+      context.lineWidth = 1.4;
+      context.strokeStyle = colors.blue;
+      context.stroke(lake);
+    }
+
     context.beginPath();
     path(shapesNow.borders);
     context.lineWidth = view.zoom > 4 ? 0.8 : 0.6;
@@ -174,10 +200,11 @@
     context.stroke(near);
 
     if (hovered && hovered !== selected) strokeRegion(hovered, colors.ink, 1);
+    marks = [];
     if (selected) {
       strokeRegion(selected, colors.blue, 1.5);
       markSmallRegion(selected);
-      drawCities();
+      drawPlaces();
     }
 
     // Shade the limb so the disc reads as a sphere. Close views have no visible limb.
@@ -229,21 +256,73 @@
     context.stroke();
   }
 
-  function drawCities() {
-    const cities = regions[selected]?.cities ?? [];
-    cities.forEach((city, index) => {
+  // Symbols for the selected region: its lake when it has no outline, its highest and
+  // lowest points, and numbered pins for its cities. Each symbol is kept for hovering.
+  function drawPlaces() {
+    const region = regions[selected];
+    if (!region) return;
+    const lake = region.lake;
+    if (lake?.at && visible(lake.at)) {
+      const [x, y] = projection(lake.at);
+      halo(() => context.arc(x, y, 4.5, 0, 2 * Math.PI), colors.blue);
+      marks.push({ x, y, r: 8, label: `Largest lake: ${lake.name}` });
+    }
+    for (const key of ["highest", "lowest"]) {
+      const point = region[key];
+      if (!point?.at || !visible(point.at)) continue;
+      const [x, y] = projection(point.at);
+      halo(() => triangle(x, y, 6.5, key === "highest" ? -1 : 1), colors.ink);
+      marks.push({ x, y, r: 9, label: `${key === "highest" ? "Highest" : "Lowest"} point: ${point.name}, ${metres(point.m)}` });
+    }
+    const cities = region.cities ?? [];
+    for (let index = cities.length - 1; index >= 0; index--) {
+      const city = cities[index];
       const point = [city[4], city[3]];
-      if (!visible(point)) return;
+      if (!visible(point)) continue;
       const [x, y] = projection(point);
-      const active = index === activeCity;
-      context.beginPath();
-      context.arc(x, y, active ? 4.5 : 2.6, 0, 2 * Math.PI);
-      context.fillStyle = active ? colors.blue : colors.paper;
-      context.fill();
-      context.lineWidth = 1.2;
-      context.strokeStyle = active ? colors.paper : colors.ink;
-      context.stroke();
-    });
+      drawPin(x, y, index + 1, index === activeCity);
+      marks.push({ x, y: y - 15, r: 9.5, label: city[0], city: index });
+    }
+    marks.reverse();
+  }
+
+  // Paint a shape with a paper edge, so it stays legible on any background.
+  function halo(shape, fill) {
+    context.beginPath();
+    shape();
+    context.closePath();
+    context.lineWidth = 3;
+    context.strokeStyle = colors.paper;
+    context.stroke();
+    context.fillStyle = fill;
+    context.fill();
+  }
+
+  // A triangle that points up (direction −1) for a highest point, down (1) for a lowest.
+  function triangle(x, y, size, direction) {
+    context.moveTo(x, y + direction * size);
+    context.lineTo(x + size * 0.95, y - direction * size * 0.65);
+    context.lineTo(x - size * 0.95, y - direction * size * 0.65);
+  }
+
+  // A pin: a round head with the rank, and a point at the city.
+  function drawPin(x, y, rank, active) {
+    const head = 7.5;
+    const top = y - 15;
+    context.beginPath();
+    context.arc(x, top, head, Math.PI * 0.75, Math.PI * 2.25);
+    context.lineTo(x, y);
+    context.closePath();
+    context.fillStyle = active ? colors.blue : colors.paper;
+    context.fill();
+    context.lineWidth = 1.2;
+    context.strokeStyle = active ? colors.blue : colors.ink;
+    context.stroke();
+    context.fillStyle = active ? colors.paper : colors.ink;
+    context.font = `600 ${rank > 9 ? 8 : 9}px ${colors.sans}`;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(String(rank), x, top + 0.5);
   }
 
   function drawCrosshair() {
@@ -400,6 +479,28 @@
     return lake.km2Max ? `${amount(lake.km2)}–${amount(lake.km2Max)} km²` : `${amount(lake.km2)} km²`;
   };
   const capital = text => text.charAt(0).toUpperCase() + text.slice(1);
+  function people(count) {
+    if (count >= 1e9) return `${decimal.format(Math.round(count / 1e7) / 100)} billion`;
+    if (count >= 1e6) return `${decimal.format(count / 1e6)} million`;
+    return integer.format(count);
+  }
+
+  // A small copy of a globe symbol, beside the label of the fact that it marks.
+  const symbols = {
+    highest: "M5 1.5 9.2 8.5H.8z",
+    lowest: "M5 8.5 9.2 1.5H.8z",
+    lake: "M5 1.2a3.8 3.8 0 1 1 0 7.6 3.8 3.8 0 0 1 0-7.6z",
+  };
+  function symbol(kind) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 10 10");
+    svg.setAttribute("class", `fact-symbol fact-symbol--${kind}`);
+    svg.setAttribute("aria-hidden", "true");
+    const shape = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    shape.setAttribute("d", symbols[kind]);
+    svg.append(shape);
+    return svg;
+  }
 
   function element(tag, className, text) {
     const node = document.createElement(tag);
@@ -408,8 +509,11 @@
     return node;
   }
 
-  function fact(list, label, parts) {
-    list.append(element("dt", "", label));
+  function fact(list, label, parts, mark) {
+    const term = element("dt");
+    if (mark) term.append(symbol(mark));
+    term.append(label);
+    list.append(term);
     const value = element("dd");
     for (const part of parts) if (part) value.append(part);
     list.append(value);
@@ -425,6 +529,9 @@
     facts.replaceChildren();
     const noData = () => element("span", "card-empty-value", "No data");
     if (!region.unassigned) {
+      fact(facts, "Population", region.population
+        ? [element("span", "fact-value", people(region.population.count)), element("span", "card-year", String(region.population.year))]
+        : [noData()]);
       fact(facts, "GDP", region.gdp
         ? [element("span", "fact-value", money(region.gdp.usd)), element("span", "card-year", String(region.gdp.year))]
         : [noData()]);
@@ -437,7 +544,7 @@
         const point = region[key];
         fact(facts, label, point
           ? [document.createTextNode(`${point.name} `), element("span", "fact-value", metres(point.m))]
-          : [noData()]);
+          : [noData()], point?.at ? key : null);
       }
       const lake = region.lake;
       const lakeNote = lake && [lake.kind ? capital(lake.kind) : "", lake.shared?.length ? `Shared with ${lake.shared.join(", ")}` : "",
@@ -445,6 +552,12 @@
       fact(facts, "Largest lake", lake
         ? [document.createTextNode(`${lake.name} `), area(lake) ? element("span", "fact-value", area(lake)) : null,
           lakeNote ? element("span", "fact-note", lakeNote) : null]
+        : [element("span", "", "None recorded")], lake && (lake.outline || lake.at) ? "lake" : null);
+      const disaster = region.disaster;
+      const deaths = disaster && `${integer.format(disaster.deaths)} ${disaster.deaths === 1 ? "death" : "deaths"}`;
+      fact(facts, "Deadliest disaster since 1900", disaster
+        ? [document.createTextNode(`${disaster.name ?? `${disaster.type}, ${disaster.year}`} `), element("span", "fact-value", deaths),
+          disaster.name ? element("span", "fact-note", `${disaster.type}, ${disaster.year}`) : null]
         : [element("span", "", "None recorded")]);
     }
 
@@ -485,7 +598,8 @@
     sources.hidden = Boolean(region.unassigned);
     if (!region.unassigned) {
       const gdpSource = region.gdp ? `GDP: ${region.gdp.source}. ` : "";
-      sources.append(document.createTextNode(`${gdpSource}Cities: GeoNames and Wikidata. Other values: The World Factbook and Wikidata. `));
+      const disasterSource = region.disaster ? `Disaster: ${region.disaster.source === "EM-DAT" ? "EM-DAT" : region.disaster.source}. ` : "";
+      sources.append(document.createTextNode(`${gdpSource}${disasterSource}Cities: GeoNames and Wikidata. Other values: The World Factbook and Wikidata. `));
       const link = element("a", "", "Sources and method");
       link.href = "#sources";
       sources.append(link);
@@ -519,7 +633,7 @@
     const [x, y] = projection([city[4], city[3]]);
     cityLabel.textContent = city[0];
     cityLabel.hidden = false;
-    cityLabel.style.left = `${Math.round(x + 8)}px`;
+    cityLabel.style.left = `${Math.round(Math.min(x + 8, labelLimit() - cityLabel.offsetWidth))}px`;
     cityLabel.style.top = `${Math.round(y - 26)}px`;
   }
 
@@ -603,6 +717,17 @@
     if (hoverFrame) return;
     hoverFrame = requestAnimationFrame(() => {
       hoverFrame = 0;
+      const mark = marks.find(entry => (entry.x - x) ** 2 + (entry.y - y) ** 2 <= entry.r ** 2);
+      if (mark || pointedMark) pointAt(mark);
+      if (mark) {
+        canvas.classList.remove("is-pointing");
+        if (hovered) { hovered = null; requestRender(); }
+        hoverLabel.textContent = mark.label;
+        hoverLabel.hidden = false;
+        hoverLabel.style.left = `${Math.max(4, Math.min(mark.x + 12, labelLimit() - hoverLabel.offsetWidth))}px`;
+        hoverLabel.style.top = `${Math.max(4, mark.y - 34)}px`;
+        return;
+      }
       const id = pick(x, y);
       canvas.classList.toggle("is-pointing", Boolean(id));
       if (id !== hovered) {
@@ -612,7 +737,7 @@
       if (id) {
         hoverLabel.textContent = regions[id]?.name ?? "";
         hoverLabel.hidden = false;
-        const left = Math.min(x + 14, size.width - hoverLabel.offsetWidth - 4);
+        const left = Math.min(x + 14, labelLimit() - hoverLabel.offsetWidth);
         hoverLabel.style.left = `${Math.max(4, left)}px`;
         hoverLabel.style.top = `${Math.max(4, y - 34)}px`;
       } else {
@@ -621,7 +746,21 @@
     });
   }
 
+  // Labels stay clear of the card when it is open beside the globe.
+  const labelLimit = () => (card.open && !narrow.matches ? card.offsetLeft : size.width) - 4;
+
+  // A pin under the pointer marks its row in the card.
+  function pointAt(mark) {
+    pointedMark = mark ?? null;
+    const index = mark?.city ?? -1;
+    if (index === activeCity) return;
+    activeCity = index;
+    for (const row of document.getElementById("city-rows").children) row.classList.toggle("is-active", Number(row.dataset.index) === index);
+    requestRender();
+  }
+
   function hideHover() {
+    if (pointedMark) pointAt(null);
     hoverLabel.hidden = true;
     canvas.classList.remove("is-pointing");
     if (hovered) {
@@ -710,7 +849,7 @@
     readColors();
     measure();
     try {
-      const [topology, data, simple] = await Promise.all(["data/world.json", "data/countries.json", "data/world-coarse.json"].map(async url => {
+      const [topology, data, simple, lakes] = await Promise.all(["data/world.json", "data/countries.json", "data/world-coarse.json", "data/lakes.json"].map(async url => {
         const response = await fetch(url);
         if (!response.ok) throw new Error(`${url}: ${response.status}`);
         return response.json();
@@ -732,6 +871,14 @@
         borders: topojson.feature(topology, topology.objects.borders),
         disputed: topojson.feature(topology, topology.objects.disputed),
       };
+      const lakeList = topojson.feature(lakes, lakes.objects.lakes).features;
+      lakeShapes = { map: { type: "FeatureCollection", features: lakeList.filter(lake => lake.properties.map) }, byRegion: new Map() };
+      for (const lake of lakeList) {
+        for (const id of lake.properties.regions ?? []) {
+          if (!lakeShapes.byRegion.has(id)) lakeShapes.byRegion.set(id, { type: "FeatureCollection", features: [] });
+          lakeShapes.byRegion.get(id).features.push(lake);
+        }
+      }
       coarse = {
         land: topojson.feature(simple, simple.objects.land),
         borders: topojson.feature(simple, simple.objects.borders),

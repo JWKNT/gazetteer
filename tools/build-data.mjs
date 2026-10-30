@@ -3,10 +3,14 @@
 // Run: node tools/build-data.mjs (after npm run fetch and node tools/build-geometry.mjs).
 import { readFileSync, writeFileSync } from 'node:fs';
 import { paths, readJson, requireFile, root, readGeonames, cityCandidates } from './lib/sources.mjs';
-import { regions as listRegions, sortKey } from './lib/regions.mjs';
+import { loadRegions, sortKey } from './lib/regions.mjs';
 import * as factbook from './lib/factbook.mjs';
 import { rankCities } from './lib/cities.mjs';
 import { indexWikidataLakes, largestLake } from './lib/lakes.mjs';
+import { loadLakeLayers, findLakeShapes, mapLakes, lakeTopology } from './lib/lake-shapes.mjs';
+import { readEmdat, deadliestDisaster } from './lib/disasters.mjs';
+import { feature } from 'topojson-client';
+import { geoContains, geoCentroid } from 'd3-geo';
 
 const collected = '30 October 2026';
 const curated = name => readJson(`${root}data/curated/${name}.json`);
@@ -15,12 +19,7 @@ const elevationFixes = curated('elevation');
 const cityFixes = curated('cities');
 const lakeFixes = curated('lakes');
 
-// Regions follow the globe shapes: Natural Earth features after the Christmas
-// Island and Cocos split, with Gibraltar from the 1:10m set.
-const naturalEarth = readJson(requireFile(paths.naturalEarth)).features.filter(f => f.properties.ADM0_A3 !== 'IOA');
-const gibraltar = readJson(requireFile(paths.naturalEarthDetail)).features.find(f => f.properties.ADM0_A3 === 'GIB');
-const islands = ['CXR', 'CCK'].map(code => ({ properties: { ADM0_A3: code, ISO_A3_EH: 'AUS', ISO_A2_EH: '-99', FIPS_10: '-99' } }));
-const regions = listRegions([...naturalEarth, gibraltar, ...islands]);
+const regions = loadRegions();
 
 // The focus of each region is the focus of its largest shape on the globe.
 const world = readJson(`${root}data/world.json`);
@@ -31,6 +30,16 @@ for (const geometry of world.objects.countries.geometries) {
 }
 const missingShapes = regions.filter(region => !focus.has(region.id)).map(region => region.id);
 if (missingShapes.length) throw new Error(`No globe shape for ${missingShapes.join(', ')}`);
+
+// Shapes of each region, to test whether a place lies in it.
+const shapesById = new Map();
+for (const shape of feature(world, world.objects.countries).features) {
+  if (!shapesById.has(shape.properties.id)) shapesById.set(shape.properties.id, []);
+  shapesById.get(shape.properties.id).push(shape);
+}
+const inRegion = (id, point) => (shapesById.get(id) ?? []).some(shape => geoContains(shape, point));
+const regionAt = point => [...shapesById.keys()].find(id => inRegion(id, point)) ?? null;
+const round3 = ([lon, lat]) => [Math.round(lon * 1000) / 1000, Math.round(lat * 1000) / 1000];
 
 const notes = {
   CYP: 'The data includes Northern Cyprus.',
@@ -67,16 +76,76 @@ function gdp(region, entries) {
   return fromFactbook ? { usd: Math.round(fromFactbook.usd), year: fromFactbook.year, source: 'The World Factbook' } : null;
 }
 
-/* Elevation: the Factbook point, with reviewed corrections. */
+/* Population: the World Bank, then The World Factbook. */
+const worldBankPopulation = new Map();
+for (const row of readJson(requireFile(paths.worldBankPopulation))[1]) {
+  if (row.value === null) continue;
+  const known = worldBankPopulation.get(row.countryiso3code);
+  if (!known || known.year < Number(row.date)) worldBankPopulation.set(row.countryiso3code, { count: row.value, year: Number(row.date) });
+}
+function population(region, entries) {
+  const bank = worldBankPopulation.get(region.worldBank);
+  if (bank) return { ...bank, source: 'World Bank' };
+  for (const entry of entries) {
+    const text = factbook.clean(entry['People and Society']?.Population?.total?.text ?? '');
+    const match = text.match(/^([\d,]+)\s*\((?:[^)]*?)(\d{4})/);
+    if (match) return { count: Number(match[1].replace(/,/g, '')), year: Number(match[2]), source: 'The World Factbook' };
+  }
+  return null;
+}
+
+/* Elevation: the Factbook point, with reviewed corrections. A point gets a position
+   when Wikidata states the same point for the country, or when a place with its
+   name lies in the country. A point at sea level on the coast has no position. */
 const capitalize = text => text.charAt(0).toUpperCase() + text.slice(1);
+const extremes = readJson(requireFile(paths.wikidataExtremes));
+const mountainWords = /\b(mount|mont|monte|mt|pico|pic|pik|cerro|gora|hora|jabal|jebel|kuh|kuh-e|phnum|puncak|gunung|volcan|nevado|peak|hill|river|delta|lake|lac|lago|the|of|de|del|la|el|on|in)\b/g;
+const placeWords = name => new Set(String(name).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  .replace(/[^a-z0-9 ]+/g, ' ').replace(mountainWords, ' ').split(/\s+/).filter(word => word.length > 2));
+const samePlace = (a, b) => [...placeWords(a)].some(word => placeWords(b).has(word));
+function locate(region, key, point) {
+  if (!point || (/^unnamed|ocean|\bsea\b|gulf|strait|channel|bay of/i.test(point.name) && point.m >= 0)) return null;
+  for (const stated of extremes[region.id]?.[key] ?? []) {
+    const close = stated.m !== null && Math.abs(stated.m - point.m) <= Math.max(15, Math.abs(point.m) * 0.03);
+    if (samePlace(stated.label, point.name) || close) return round3(stated.at);
+  }
+  const name = point.name.replace(/\s*\(.*\)\s*/g, ' ').split(/ on | in the /)[0].trim();
+  const found = (extremes._search?.[name] ?? []).find(candidate => inRegion(region.id, candidate.at));
+  return found ? round3(found.at) : null;
+}
 function elevation(region, entries) {
   const points = entries.map(factbook.elevation);
   const highest = points.map(p => p.highest).filter(Boolean).sort((a, b) => b.m - a.m)[0] ?? null;
   const lowest = points.map(p => p.lowest).filter(Boolean).sort((a, b) => a.m - b.m)[0] ?? null;
   const fixes = elevationFixes[region.id] ?? {};
-  const tidy = point => point && { name: capitalize(point.name), m: point.m };
-  return { highest: tidy(fixes.highest ?? highest), lowest: tidy(fixes.lowest ?? lowest) };
+  const tidy = (point, key) => {
+    if (!point) return null;
+    const at = locate(region, key, point);
+    return { name: capitalize(point.name), m: point.m, ...(at ? { at } : {}) };
+  };
+  return { highest: tidy(fixes.highest ?? highest, 'highest'), lowest: tidy(fixes.lowest ?? lowest, 'lowest') };
 }
+
+/* Disasters: EM-DAT entries, named with Wikidata events. */
+const emdat = readEmdat(requireFile(paths.disasters));
+const emdatExtra = { FRA: ['GLP', 'MTQ', 'GUF', 'REU', 'MYT'], NOR: ['SJM'], NLD: ['BES'], FIN: ['ALA'] };
+const regionByWikidata = new Map(regions.map(region => [region.wikidata, region.id]));
+const disasterFixes = curated('disasters');
+function byRegion(list) {
+  const result = new Map();
+  for (const event of list) {
+    let ids = [...new Set(event.countries.map(id => regionByWikidata.get(id)).filter(Boolean))];
+    if (!ids.length && event.at) ids = [regionAt(event.at)].filter(Boolean);
+    for (const id of ids) {
+      if (!result.has(id)) result.set(id, []);
+      result.get(id).push({ ...event, countryCount: ids.length });
+    }
+  }
+  return result;
+}
+const wikidataDisasters = readJson(requireFile(paths.wikidataDisasters));
+const tollsByRegion = byRegion(wikidataDisasters.tolls);
+const eventsByRegion = byRegion(wikidataDisasters.events);
 
 /* Exports: the Factbook list of the five largest commodities by value. */
 function exportsOf(entries) {
@@ -98,6 +167,9 @@ function cities(region) {
 
 /* Lakes */
 const wikidataLakes = indexWikidataLakes(readJson(requireFile(paths.wikidataLakes)), new Set(Object.keys(lakeFixes.excludeItems ?? {})));
+const lakePoints = readJson(requireFile(paths.wikidataLakePoints));
+const lakeLayers = loadLakeLayers();
+const lakeShapes = mapLakes(lakeLayers).map(entry => ({ entry, map: true }));
 const namesByWikidata = new Map(regions.map(region => [region.wikidata, region.name]));
 
 function languagesOf(region) {
@@ -117,18 +189,39 @@ for (const region of regions) {
     output[region.id] = record;
     continue;
   }
+  record.population = population(region, entries);
   record.gdp = gdp(region, entries);
   record.languages = languagesOf(region);
   Object.assign(record, elevation(region, entries));
   const lakeFix = lakeFixes[region.id];
   record.lake = lakeFix !== undefined
-    ? lakeFix && { name: lakeFix.name, km2: lakeFix.km2, ...(lakeFix.kind ? { kind: lakeFix.kind } : {}), shared: lakeFix.shared ?? [] }
+    ? lakeFix && { item: lakeFix.item, name: lakeFix.name, km2: lakeFix.km2, ...(lakeFix.kind ? { kind: lakeFix.kind } : {}), shared: lakeFix.shared ?? [] }
     : largestLake(region, wikidataLakes, entries.flatMap(factbook.lakes), namesByWikidata, lakeFixes.skipFactbook);
-  if (record.lake) delete record.lake.source;
+  if (record.lake) {
+    // An outline from Natural Earth, or else a position for a lake symbol.
+    const found = findLakeShapes(record.lake, { focus: record.focus }, lakeLayers);
+    for (const entry of found) lakeShapes.push({ entry, region: region.id });
+    const point = lakePoints[record.lake.item] ?? (found.length ? geoCentroid(found[0].feature) : null);
+    if (found.length) record.lake.outline = true;
+    else if (point) record.lake.at = round3(point);
+    delete record.lake.source;
+    delete record.lake.item;
+  }
+  const fix = disasterFixes[region.id];
+  record.disaster = deadliestDisaster({ id: region.id, emdatCodes: [region.worldBank, ...(emdatExtra[region.id] ?? [])] },
+    emdat, tollsByRegion.get(region.id) ?? [], eventsByRegion.get(region.id) ?? [],
+    fix?.deaths ? { name: fix.name, type: fix.type, year: fix.year, deaths: fix.deaths, source: fix.source } : null);
+  // A reviewed name or type for the record of that year.
+  if (fix && !fix.deaths && record.disaster?.year === fix.year) {
+    if (fix.name) record.disaster.name = fix.name;
+    if (fix.type) record.disaster.type = fix.type;
+  }
   record.exports = exportsOf(entries);
   record.cities = cities(region);
   output[region.id] = record;
 }
+
+writeFileSync(`${root}data/lakes.json`, JSON.stringify(lakeTopology(lakeShapes)));
 
 // One region per line keeps the file small and its history readable.
 const lines = Object.entries(output).map(([id, record]) => `${JSON.stringify(id)}:${JSON.stringify(record)}`);

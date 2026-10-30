@@ -48,6 +48,7 @@ export function largestLake(region, wikidataLakes, factbookLakes, namesByWikidat
   const fromFactbook = factbookLakes.filter(lake => !skipFactbook.includes(lake.name))
     .sort((a, b) => (b.km2Max ?? b.km2) - (a.km2Max ?? a.km2))[0] ?? null;
   const wikidataLake = fromWikidata && {
+    item: fromWikidata.item,
     name: fromWikidata.label,
     km2: round(fromWikidata.area),
     kind: kindOrder.find(kind => fromWikidata.kinds.has(kind)) ?? null,

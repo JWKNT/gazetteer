@@ -18,11 +18,11 @@
     <link rel="stylesheet" href="https://jehlp.net/site-theme/v2/base.css?v=20261009-reading-folio">
     <link rel="stylesheet" href="https://jehlp.net/site-theme/v2/components.css">
     <script src="https://jehlp.net/site-theme/v2/components.js" defer></script>
-    <link rel="stylesheet" href="assets/styles.css?v=20261030">
+    <link rel="stylesheet" href="assets/styles.css?v=20261030b">
     <script src="assets/vendor/d3-array.min.js" defer></script>
     <script src="assets/vendor/d3-geo.min.js" defer></script>
     <script src="assets/vendor/topojson-client.min.js" defer></script>
-    <script src="assets/app.js?v=20261030" defer></script>
+    <script src="assets/app.js?v=20261030b" defer></script>
   </head>
   <body data-site-tone="teal">
     <a class="skip-link" href="#country-select">Skip to the country list</a>
@@ -327,7 +327,7 @@
         </dialog>
       </div>
 
-      <p class="globe-help" id="globe-help">Drag the globe to turn it. Scroll or pinch to zoom. Click a country to see its data. When the globe has focus, use the arrow keys to turn it and + or − to zoom. Press Enter to open the country at the center.</p>
+      <p class="globe-help" id="globe-help">Drag the globe to turn it. Scroll or pinch to zoom. Click a country to see its data. When the globe has focus, use the arrow keys to turn it and + or − to zoom. Press Enter to open the country at the center. Point to a pin or a symbol to see its name.</p>
       <noscript><p class="noscript">The globe needs JavaScript.</p></noscript>
     </main>
 
@@ -352,8 +352,20 @@
           <dd>The values come from The World Factbook and Wikidata. The largest lake is the largest body of standing water by area. Reservoirs and salt lakes are included. Lagoons of the sea, salt flats and former lakes are not. For a shared lake, the area is the area of the whole lake.</dd>
         </div>
         <div>
+          <dt>Population</dt>
+          <dd>The <a href="https://data.worldbank.org/indicator/SP.POP.TOTL">World Bank</a> gives the population for the most recent year. The World Factbook gives it for Taiwan and for most territories.</dd>
+        </div>
+        <div>
           <dt>GDP</dt>
           <dd>GDP is nominal, in current US dollars. The <a href="https://data.worldbank.org/indicator/NY.GDP.MKTP.CD">World Bank</a> gives the most recent year. The <a href="https://www.imf.org/external/datamapper/NGDPD@WEO">IMF World Economic Outlook</a> gives the figure for Taiwan and for countries where the World Bank figure is before 2023. The World Factbook gives the figure for most territories.</dd>
+        </div>
+        <div>
+          <dt>Disasters</dt>
+          <dd><a href="https://www.emdat.be/">EM-DAT</a> records the deaths from natural disasters by country, year and type. <a href="https://ourworldindata.org/natural-disasters">Our World in Data</a> publishes these records. A figure can include more than one event of the same type in that year. Wikidata gives the name of the event when its country, year and type agree. The list does not include droughts, because most of their deaths are from famine. EM-DAT records events before 1992 under the USSR and Yugoslavia. For their successor states, a Wikidata event can replace the EM-DAT figure.</dd>
+        </div>
+        <div>
+          <dt>Map symbols</dt>
+          <dd>Pins show the most populous cities in order. Triangles show the highest and lowest points, from Wikidata positions. A lowest point at sea level on the coast has no triangle. Natural Earth gives the lake outlines. A dot shows a lake without an outline.</dd>
         </div>
         <div>
           <dt>Official languages</dt>
@@ -364,7 +376,8 @@
     </section>
 
     <footer class="site-footer">
-      <p>jehlp.net · Data: Natural Earth (public domain), GeoNames (CC BY 4.0), Wikidata (CC0), The World Factbook (public domain), World Bank (CC BY 4.0), IMF. · <a href="https://github.com/JWKNT/gazetteer">Source</a></p>
+      <p>The data comes from Natural Earth, GeoNames, Wikidata, The World Factbook, the World Bank, the IMF and EM-DAT.</p>
+      <p>jehlp.net · <a href="https://github.com/JWKNT/gazetteer">Source</a></p>
     </footer>
   </body>
 </html>

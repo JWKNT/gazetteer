@@ -37,23 +37,27 @@
     "source": "The World Factbook"
   },
   "ATA": {
+    "item": "Q152044",
     "name": "Lake Vostok",
     "km2": 14000,
     "kind": "subglacial lake",
     "source": "Wikidata Q152044"
   },
   "BGD": {
+    "item": "Q10995968",
     "name": "Kaptai Lake",
     "km2": 688,
     "kind": "reservoir",
     "source": "Wikipedia, Kaptai Lake"
   },
   "BLR": {
+    "item": "Q747554",
     "name": "Lake Narach",
     "km2": 79.2,
     "source": "Wikidata Q747554"
   },
   "CIV": {
+    "item": "Q267679",
     "name": "Lake Kossou",
     "km2": 1740,
     "kind": "reservoir",
@@ -69,35 +73,41 @@
     "source": "The World Factbook"
   },
   "KOR": {
+    "item": "Q16174738",
     "name": "Chungju Lake",
     "km2": 66.5,
     "kind": "reservoir",
     "source": "Area submerged by Chungju Dam"
   },
   "LKA": {
+    "item": "Q105038056",
     "name": "Senanayake Samudraya",
     "km2": null,
     "kind": "reservoir",
     "source": "Sri Lanka Irrigation Department: largest reservoir; no area published"
   },
   "MLI": {
+    "item": "Q2723824",
     "name": "Lake Sélingué",
     "km2": 409,
     "kind": "reservoir",
     "source": "Wikidata Q2723824. Lac Faguibine is often dry."
   },
   "MMR": {
+    "item": "Q3056649",
     "name": "Indawgyi Lake",
     "km2": 120,
     "source": "Indawgyi Lake site: 12,000 ha of open water"
   },
   "MYS": {
+    "item": "Q1420437",
     "name": "Kenyir Lake",
     "km2": 260,
     "kind": "reservoir",
     "source": "Wikipedia, Kenyir Lake"
   },
   "PHL": {
+    "item": "Q47136",
     "name": "Laguna de Bay",
     "km2": 890,
     "source": "The World Factbook (a freshwater lake)"
@@ -121,6 +131,7 @@
     "source": "List of lakes of Serbia"
   },
   "SYR": {
+    "item": "Q979315",
     "name": "Lake Assad",
     "km2": 610,
     "kind": "reservoir",

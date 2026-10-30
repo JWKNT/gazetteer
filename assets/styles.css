@@ -167,7 +167,7 @@
 
 .card-facts {
   display: grid;
-  grid-template-columns: minmax(6.5rem, auto) minmax(0, 1fr);
+  grid-template-columns: minmax(6.5rem, 9.5rem) minmax(0, 1fr);
   gap: 0 .9rem;
   margin: .25rem 0 0;
 }
@@ -186,10 +186,13 @@
 }
 .card-facts > :nth-last-child(-n + 2) { border-bottom: 0; }
 .fact-value { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fact-symbol { width: .7rem; height: .7rem; margin-right: .4rem; vertical-align: -.02rem; fill: var(--ink); }
+.fact-symbol--lake { fill: var(--blue); }
 .fact-note { display: block; margin-top: .1rem; }
 
 .card-year {
   margin-left: .3rem;
+  white-space: nowrap;
   color: var(--muted);
   font: 400 var(--text-meta, .75rem)/1 var(--mono);
 }

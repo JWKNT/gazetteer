@@ -16,6 +16,10 @@ official languages. The page uses the shared [jehlp.net site theme](https://jehl
 | Lakes and reservoirs | Wikidata | CC0 |
 | GDP | [World Bank](https://data.worldbank.org/indicator/NY.GDP.MKTP.CD), [IMF WEO](https://www.imf.org/external/datamapper/NGDPD@WEO), The World Factbook | CC BY 4.0, IMF terms, public domain |
 | Official languages | Reviewed list, compared with The World Factbook and Wikidata | — |
+| Population | [World Bank](https://data.worldbank.org/indicator/SP.POP.TOTL), The World Factbook | CC BY 4.0, public domain |
+| Natural disasters | [EM-DAT](https://www.emdat.be/) through [Our World in Data](https://ourworldindata.org/natural-disasters), named with Wikidata | EM-DAT terms, CC BY 4.0, CC0 |
+| Lake outlines | Natural Earth lakes (1:50m and 1:10m) and marine polygons (the Caspian Sea) | Public domain |
+| Positions of highest and lowest points | Wikidata | CC0 |
 
 The CIA stopped The World Factbook in February 2026. The `factbook.json` mirror keeps its final edition.
 
@@ -38,6 +42,13 @@ The CIA stopped The World Factbook in February 2026. The `factbook.json` mirror 
   A shared lake shows its full area.
 - **GDP.** The latest World Bank value from 2023 or later. Otherwise the IMF value for 2025 or
   earlier, then an older World Bank value, then the Factbook.
+- **Disasters.** The deadliest EM-DAT entry since 1900 by country, year and type, without droughts.
+  A Wikidata event of the same country, year and type gives the name. For the successor states of
+  the USSR and Yugoslavia, a single-country Wikidata event with a larger toll can replace it.
+  `data/curated/disasters.json` holds reviewed names and one sourced replacement.
+- **Symbols.** A highest or lowest point gets a position when Wikidata states the same point for
+  the country, or when a place with its name lies in the country. Lake outlines join Natural Earth
+  to the lake by Wikidata ID, then by name near the country. Other lakes get a dot.
 
 ## Development
 

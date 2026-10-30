@@ -1,4 +1,5 @@
 // One record for each selectable region on the globe, with its key in each source.
+import { paths, readJson, requireFile } from './sources.mjs';
 // Natural Earth gives the outlines. Most keys come from its attributes. The
 // exceptions below are listed by Natural Earth's ADM0_A3 code or by region ID.
 
@@ -91,4 +92,13 @@ export function regions(features) {
     });
   }
   return [...byId.values()].sort((a, b) => sortKey(a.name).localeCompare(sortKey(b.name)));
+}
+
+// The regions follow the globe shapes: Natural Earth features after the Christmas
+// Island and Cocos split, with Gibraltar from the 1:10m set.
+export function loadRegions() {
+  const naturalEarth = readJson(requireFile(paths.naturalEarth)).features.filter(f => f.properties.ADM0_A3 !== 'IOA');
+  const gibraltar = readJson(requireFile(paths.naturalEarthDetail)).features.find(f => f.properties.ADM0_A3 === 'GIB');
+  const islands = ['CXR', 'CCK'].map(code => ({ properties: { ADM0_A3: code, ISO_A3_EH: 'AUS', ISO_A2_EH: '-99', FIPS_10: '-99' } }));
+  return regions([...naturalEarth, gibraltar, ...islands]);
 }

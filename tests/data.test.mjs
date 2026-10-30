@@ -79,7 +79,8 @@ test('the city lists exclude districts of a larger city', () => {
 });
 
 test('representative values match their sources', () => {
-  assert.deepEqual(regions.JPN.highest, { name: 'Mount Fuji', m: 3776 });
+  assert.equal(regions.JPN.highest.name, 'Mount Fuji');
+  assert.equal(regions.JPN.highest.m, 3776);
   assert.equal(regions.FRA.highest.name, 'Mont Blanc');
   assert.ok(regions.CHE.languages.list.includes('Romansh'));
   assert.equal(regions.ZAF.languages.list.length, 12);
@@ -89,4 +90,39 @@ test('representative values match their sources', () => {
   assert.equal(regions.GHA.lake.kind, 'reservoir');
   assert.ok(regions.KAS.unassigned && regions.KAS.note);
   assert.equal(regions.CHN.cities[0][0], 'Chongqing');
+});
+
+test('population, disasters and positions are present and plausible', () => {
+  const records = Object.entries(regions).filter(([, region]) => !region.unassigned);
+  assert.ok(records.filter(([, region]) => region.population?.count > 0).length >= 225);
+  for (const [id, region] of records) {
+    const disaster = region.disaster;
+    if (disaster) {
+      assert.ok(disaster.year >= 1900 && disaster.year <= 2026, `${id} disaster year`);
+      assert.ok(Number.isInteger(disaster.deaths) && disaster.deaths > 0, `${id} disaster deaths`);
+      assert.ok(disaster.type && !/drought/i.test(disaster.type), `${id} disaster type`);
+      assert.doesNotMatch(disaster.name ?? '', /^Q\d+$/, `${id} disaster name`);
+    }
+    for (const key of ['highest', 'lowest']) {
+      const at = region[key]?.at;
+      if (at) assert.ok(Math.abs(at[0]) <= 180 && Math.abs(at[1]) <= 90, `${id} ${key} position`);
+    }
+  }
+  assert.equal(regions.HTI.disaster.year, 2010);
+  assert.equal(regions.JPN.disaster.year, 1923);
+  assert.equal(regions.BGD.disaster.name, '1970 Bhola cyclone');
+  assert.equal(regions.TKM.disaster.name, '1948 Ashgabat earthquake');
+  const [lon, lat] = regions.USA.highest.at;
+  assert.ok(Math.abs(lon + 151) < 1 && Math.abs(lat - 63) < 1, 'Denali is in Alaska');
+});
+
+test('each outlined lake has a shape, and the globe has map lakes', () => {
+  const lakes = JSON.parse(read('data/lakes.json'));
+  const shapes = lakes.objects.lakes.geometries;
+  const outlined = new Set(shapes.flatMap(shape => shape.properties.regions ?? []));
+  for (const [id, region] of Object.entries(regions)) {
+    if (region.lake?.outline) assert.ok(outlined.has(id), `${id} lake outline`);
+  }
+  assert.ok(shapes.filter(shape => shape.properties.map).length >= 50);
+  assert.ok(read('data/lakes.json').length < 220 * 1024);
 });

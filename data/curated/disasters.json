@@ -1,0 +1,140 @@
+{
+  "_about": "Reviewed corrections to the deadliest natural disaster since 1900. An entry with 'deaths' replaces the record and gives its source. An entry without 'deaths' names an EM-DAT record of the same year, where Wikidata gives no country for the event or names the wrong one.",
+  "TKM": {
+    "name": "1948 Ashgabat earthquake",
+    "type": "Earthquake",
+    "year": 1948,
+    "deaths": 110000,
+    "source": "USGS significant earthquakes"
+  },
+  "BGD": {
+    "year": 1970,
+    "name": "1970 Bhola cyclone",
+    "type": "Tropical cyclone"
+  },
+  "MMR": {
+    "year": 2008,
+    "name": "Cyclone Nargis",
+    "type": "Tropical cyclone"
+  },
+  "PHL": {
+    "year": 2013,
+    "name": "Typhoon Haiyan",
+    "type": "Typhoon"
+  },
+  "VEN": {
+    "year": 1999,
+    "name": "Vargas tragedy",
+    "type": "Flood"
+  },
+  "RUS": {
+    "year": 2010,
+    "name": "2010 Russian heat wave",
+    "type": "Heat wave"
+  },
+  "DEU": {
+    "year": 2003,
+    "name": "2003 European heat wave",
+    "type": "Heat wave"
+  },
+  "CHE": {
+    "year": 2003,
+    "name": "2003 European heat wave",
+    "type": "Heat wave"
+  },
+  "PRT": {
+    "year": 2003,
+    "name": "2003 European heat wave",
+    "type": "Heat wave"
+  },
+  "HKG": {
+    "year": 1937,
+    "name": "1937 Hong Kong typhoon",
+    "type": "Typhoon"
+  },
+  "CMR": {
+    "year": 1986,
+    "name": "Lake Nyos disaster",
+    "type": "Limnic eruption"
+  },
+  "VCT": {
+    "year": 1902,
+    "name": "1902 eruption of La Soufrière",
+    "type": "Volcanic eruption"
+  },
+  "BLZ": {
+    "year": 1931,
+    "name": "1931 British Honduras hurricane",
+    "type": "Hurricane"
+  },
+  "CUB": {
+    "year": 1932,
+    "name": "1932 Cuba hurricane",
+    "type": "Hurricane"
+  },
+  "DOM": {
+    "year": 1930,
+    "name": "1930 Dominican Republic hurricane",
+    "type": "Hurricane"
+  },
+  "MWI": {
+    "year": 2023,
+    "name": "Cyclone Freddy",
+    "type": "Tropical cyclone"
+  },
+  "TON": {
+    "year": 2009,
+    "name": "2009 Samoa earthquake and tsunami",
+    "type": "Earthquake and tsunami"
+  },
+  "NOR": {
+    "year": 1936,
+    "name": "1936 Loen rockslide and tsunami",
+    "type": "Tsunami"
+  },
+  "AUT": {
+    "year": 2024,
+    "type": "Heat wave"
+  },
+  "BEL": {
+    "year": 2020,
+    "type": "Heat wave"
+  },
+  "BGR": {
+    "year": 2024,
+    "type": "Heat wave"
+  },
+  "HRV": {
+    "year": 2024,
+    "type": "Heat wave"
+  },
+  "GRC": {
+    "year": 2024,
+    "type": "Heat wave"
+  },
+  "HUN": {
+    "year": 2024,
+    "type": "Heat wave"
+  },
+  "POL": {
+    "year": 2024,
+    "type": "Heat wave"
+  },
+  "ROU": {
+    "year": 2024,
+    "type": "Heat wave"
+  },
+  "SRB": {
+    "year": 2024,
+    "type": "Heat wave"
+  },
+  "SAU": {
+    "year": 2024,
+    "type": "Heat wave"
+  },
+  "ESP": {
+    "year": 2003,
+    "name": "2003 European heat wave",
+    "type": "Heat wave"
+  }
+}
