@@ -1,0 +1,23 @@
+{
+  "_about": "Reviewed changes to the capital from GeoNames (feature code PPLC of the region's main country code). null: the card shows no capital. 'note' adds a remark. 'geonameId', or 'name' with 'at' as [longitude, latitude], sets another place.",
+  "BEN": { "note": "The government sits in Cotonou." },
+  "BOL": { "note": "La Paz is the seat of government." },
+  "CHE": { "note": "The constitution names no capital. Bern is the federal city." },
+  "CHL": { "note": "The National Congress meets in Valparaíso." },
+  "CIV": { "note": "Most government offices are in Abidjan." },
+  "ESH": null,
+  "GNQ": { "note": "Ciudad de la Paz became the capital in January 2026. The government is moving there from Malabo." },
+  "HKG": null,
+  "IND": { "note": "New Delhi lies in the National Capital Territory of Delhi." },
+  "ISR": { "geonameId": "281184", "note": "Many countries do not recognize Jerusalem as the capital. Most embassies are in Tel Aviv." },
+  "LKA": { "note": "Sri Jayawardenepura Kotte is the legislative capital." },
+  "MAC": null,
+  "MNE": { "note": "Cetinje has the title of Old Royal Capital." },
+  "MSR": { "note": "Plymouth has been empty since the 1997 eruption. The government sits in Brades." },
+  "MYS": { "note": "The government sits in Putrajaya." },
+  "NLD": { "note": "The government sits in The Hague." },
+  "NRU": { "note": "Nauru has no official capital. The government sits in Yaren." },
+  "PSE": { "name": "East Jerusalem", "at": [35.234, 31.783], "note": "Palestine proclaims East Jerusalem as its capital. The government sits in Ramallah." },
+  "SWZ": { "note": "Lobamba is the royal and legislative capital." },
+  "ZAF": { "note": "Cape Town is the legislative capital. Bloemfontein is the judicial capital." }
+}

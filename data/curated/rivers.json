@@ -1,0 +1,103 @@
+{
+  "_about": "Reviewed choices for the longest river. null: the card shows no river. 'item' sets the Wikidata river. 'name' and 'km' replace the Wikidata label and length, or give a river that has no Wikidata length. '_join' gives, for a Wikidata river, the Natural Earth line names that are parts of it. '_names' replaces a Wikidata label. '_split' divides a Natural Earth line that follows two rivers.",
+  "_join": {
+    "Q3392": [
+      "White Nile",
+      "Mountain Nile",
+      "Bahr el Jebel",
+      "Albert Nile",
+      "Victoria Nile",
+      "Kagera"
+    ],
+    "Q121538": [
+      "Tornelven"
+    ]
+  },
+  "_split": [
+    {
+      "name": "Paraná",
+      "rivernum": 36,
+      "latitude": -27.3,
+      "north": "Q179396",
+      "reason": "Natural Earth draws the Paraguay River and the lower Paraná as one line. The rivers meet at 27.3° S."
+    }
+  ],
+  "_names": {
+    "Q3503": "Congo River",
+    "Q1474026": "Rajang River"
+  },
+  "BLZ": {
+    "item": "Q815650",
+    "reason": "The Belize River is the longest river of Belize. The Hondo has a line but is shorter."
+  },
+  "BRN": {
+    "name": "Belait River",
+    "reason": "Wikipedia names the Belait as the longest river of Brunei. Wikidata gives no length. The Baram flows in Malaysia."
+  },
+  "CHL": {
+    "item": "Q737831",
+    "reason": "The Loa, 440 km, is the longest river of Chile. Natural Earth has no line for it."
+  },
+  "DNK": {
+    "name": "Gudenå",
+    "km": 149,
+    "reason": "Danish Wikipedia: 149 km, the longest river of Denmark. Wikidata gives no length."
+  },
+  "FRO": null,
+  "GNB": {
+    "item": "Q2411947",
+    "reason": "The Corubal flows from Guinea into Guinea-Bissau and is longer than the Geba."
+  },
+  "GNQ": {
+    "item": "Q3086717",
+    "reason": "The Campo (Ntem) forms the border with Cameroon and is longer than the Benito."
+  },
+  "JAM": {
+    "item": "Q2154401",
+    "reason": "The Rio Minho is the longest river of Jamaica. Wikidata gives the Cabarita River a wrong length of 397 km."
+  },
+  "JPN": {
+    "item": "Q734455",
+    "reason": "The Shinano is the longest river of Japan. Natural Earth has no line for it."
+  },
+  "KGZ": {
+    "item": "Q524206",
+    "km": 1067,
+    "reason": "The Chu flows through Kyrgyzstan and is longer than the Naryn. Wikipedia gives 1,067 km. Wikidata gives 1,318 km."
+  },
+  "LBN": {
+    "item": "Q188871",
+    "reason": "The Orontes rises in Lebanon and is longer than the Jordan."
+  },
+  "LCA": null,
+  "MAR": {
+    "item": "Q486636",
+    "reason": "The Draa is the longest river of Morocco. Natural Earth has no line for it."
+  },
+  "MKD": {
+    "item": "Q189596",
+    "reason": "The Vardar is the longest river of North Macedonia. Natural Earth has no line for it."
+  },
+  "MNG": {
+    "item": "Q641020",
+    "reason": "The Irtysh rises in China near the border. The Kherlen is the longest river of Mongolia."
+  },
+  "MYS": {
+    "item": "Q1474026",
+    "reason": "The Rajang is the longest river of Malaysia. Natural Earth has no line for it."
+  },
+  "SLB": null,
+  "SLE": {
+    "item": "Q2503121",
+    "reason": "The Moa flows through Sierra Leone and is longer than the Rokel."
+  },
+  "UKR": {
+    "item": "Q1653",
+    "reason": "The Danube forms the border with Romania along its Chilia branch. The Natural Earth line follows another branch."
+  },
+  "XKX": {
+    "item": "Q392840",
+    "reason": "The Ibar flows through Kosovo. The Natural Earth line for the Morava touches only its border."
+  },
+  "YEM": null
+}

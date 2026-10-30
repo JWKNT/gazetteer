@@ -34,6 +34,8 @@
   let lines = {};
   let coarse = null;
   let lakeShapes = { map: null, byRegion: new Map() };
+  let riverShapes = new Map();
+  let riverPath = null;
   let marks = [];
   let pointedMark = null;
   let moving = false;
@@ -201,9 +203,11 @@
 
     if (hovered && hovered !== selected) strokeRegion(hovered, colors.ink, 1);
     marks = [];
+    riverPath = null;
     if (selected) {
       strokeRegion(selected, colors.blue, 1.5);
       markSmallRegion(selected);
+      drawRiver(selected);
       drawPlaces();
     }
 
@@ -256,8 +260,39 @@
     context.stroke();
   }
 
+  // The longest river of the selected region: a blue line with a paper edge. Its path is
+  // kept for hovering.
+  function drawRiver(id) {
+    const river = riverShapes.get(id);
+    if (!river) return;
+    riverPath = new Path2D();
+    d3.geoPath(projection, riverPath)(river);
+    context.lineJoin = "round";
+    context.lineCap = "round";
+    context.lineWidth = 3.6;
+    context.strokeStyle = colors.paper;
+    context.stroke(riverPath);
+    context.lineWidth = 1.8;
+    context.strokeStyle = colors.blue;
+    context.stroke(riverPath);
+    context.lineJoin = "miter";
+    context.lineCap = "butt";
+  }
+
+  // Whether a point in CSS pixels lies on the drawn river, with some room for the pointer.
+  function onRiver(x, y) {
+    if (!riverPath) return false;
+    context.save();
+    context.setTransform(size.ratio, 0, 0, size.ratio, 0, 0);
+    context.lineWidth = 8;
+    const hit = context.isPointInStroke(riverPath, x * size.ratio, y * size.ratio);
+    context.restore();
+    return hit;
+  }
+
   // Symbols for the selected region: its lake when it has no outline, its highest and
-  // lowest points, and numbered pins for its cities. Each symbol is kept for hovering.
+  // lowest points, and numbered pins for its cities. The capital's pin is a star. A
+  // capital outside the ten cities is a small star. Each symbol is kept for hovering.
   function drawPlaces() {
     const region = regions[selected];
     if (!region) return;
@@ -274,14 +309,25 @@
       halo(() => triangle(x, y, 6.5, key === "highest" ? -1 : 1), colors.ink);
       marks.push({ x, y, r: 9, label: `${key === "highest" ? "Highest" : "Lowest"} point: ${point.name}, ${metres(point.m)}` });
     }
+    const capitalCity = region.capital;
     const cities = region.cities ?? [];
     for (let index = cities.length - 1; index >= 0; index--) {
       const city = cities[index];
       const point = [city[4], city[3]];
       if (!visible(point)) continue;
       const [x, y] = projection(point);
-      drawPin(x, y, index + 1, index === activeCity);
-      marks.push({ x, y: y - 15, r: 9.5, label: city[0], city: index });
+      if (capitalCity?.city === index) {
+        drawStarPin(x, y, index + 1, index === activeCity);
+        marks.push({ x, y: y - 16, r: 11, label: `Capital: ${city[0]}`, city: index });
+      } else {
+        drawPin(x, y, index + 1, index === activeCity);
+        marks.push({ x, y: y - 15, r: 9.5, label: city[0], city: index });
+      }
+    }
+    if (capitalCity?.at && visible(capitalCity.at)) {
+      const [x, y] = projection(capitalCity.at);
+      halo(() => star(x, y, 6.5, 3.4), colors.ink);
+      marks.push({ x, y, r: 8, label: `Capital: ${capitalCity.name}` });
     }
     marks.reverse();
   }
@@ -323,6 +369,43 @@
     context.textAlign = "center";
     context.textBaseline = "middle";
     context.fillText(String(rank), x, top + 0.5);
+  }
+
+  // The capital's pin: a star with the rank, and a point at the city. The star and its
+  // point wind the same way, so they fill as one shape inside a paper edge.
+  function drawStarPin(x, y, rank, active) {
+    const top = y - 16;
+    context.beginPath();
+    context.moveTo(x + 2.2, top + 4);
+    context.lineTo(x, y);
+    context.lineTo(x - 2.2, top + 4);
+    context.closePath();
+    star(x, top, 11, 5.8);
+    context.lineJoin = "round";
+    context.lineWidth = 2.5;
+    context.strokeStyle = colors.paper;
+    context.stroke();
+    context.lineJoin = "miter";
+    context.fillStyle = active ? colors.blue : colors.ink;
+    context.fill();
+    context.fillStyle = colors.paper;
+    context.font = `600 ${rank > 9 ? 7.5 : 9}px ${colors.sans}`;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(String(rank), x, top + 1);
+  }
+
+  // A five-pointed star, point up, as a sub-path of the current path.
+  function star(x, y, outer, inner) {
+    for (let i = 0; i < 10; i++) {
+      const radius = i % 2 ? inner : outer;
+      const angle = Math.PI * (i / 5 - 0.5);
+      const px = x + radius * Math.cos(angle);
+      const py = y + radius * Math.sin(angle);
+      if (i) context.lineTo(px, py);
+      else context.moveTo(px, py);
+    }
+    context.closePath();
   }
 
   function drawCrosshair() {
@@ -479,6 +562,10 @@
     return lake.km2Max ? `${amount(lake.km2)}–${amount(lake.km2Max)} km²` : `${amount(lake.km2)} km²`;
   };
   const capital = text => text.charAt(0).toUpperCase() + text.slice(1);
+  const percent = share => share < 1 ? "<1%" : `${Math.round(share)}%`;
+  const listText = items => items.length > 1 ? `${items.slice(0, -1).join(", ")} and ${items.at(-1)}` : items.join("");
+  // Group names such as "No religion" start lower case inside a sentence.
+  const groupInText = name => /^(No|Other) /.test(name) ? name.charAt(0).toLowerCase() + name.slice(1) : name;
   function people(count) {
     if (count >= 1e9) return `${decimal.format(Math.round(count / 1e7) / 100)} billion`;
     if (count >= 1e6) return `${decimal.format(count / 1e6)} million`;
@@ -490,6 +577,8 @@
     highest: "M5 1.5 9.2 8.5H.8z",
     lowest: "M5 8.5 9.2 1.5H.8z",
     lake: "M5 1.2a3.8 3.8 0 1 1 0 7.6 3.8 3.8 0 0 1 0-7.6z",
+    capital: "M5 .7 6.41 3.46 9.47 3.95 7.28 6.14 7.76 9.2 5 7.8 2.24 9.2 2.72 6.14.53 3.95 3.59 3.46z",
+    river: "M.9 6.3c1.4-2.6 2.7-2.6 4.1 0s2.7 2.6 4.1 0",
   };
   function symbol(kind) {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -509,14 +598,20 @@
     return node;
   }
 
-  function fact(list, label, parts, mark) {
+  // A fact row: a label, a text value, a figure in a right-aligned column, and a note.
+  function fact(list, label, { text = "", figure = "", year = null, note = "", mark = null, empty = false }) {
     const term = element("dt");
     if (mark) term.append(symbol(mark));
     term.append(label);
-    list.append(term);
     const value = element("dd");
-    for (const part of parts) if (part) value.append(part);
-    list.append(value);
+    if (text) value.append(element("span", empty ? "fact-text fact-text--empty" : "fact-text", text));
+    if (figure) {
+      const cell = element("span", "fact-figure", figure);
+      if (year) cell.append(element("span", "card-year", String(year)));
+      value.append(cell);
+    }
+    if (note) value.append(element("span", "fact-note", note));
+    list.append(term, value);
   }
 
   function fillCard(id, region) {
@@ -527,38 +622,48 @@
 
     const facts = document.getElementById("card-facts");
     facts.replaceChildren();
-    const noData = () => element("span", "card-empty-value", "No data");
+    const noData = { text: "No data", empty: true };
+    const noneRecorded = { text: "None recorded", empty: true };
     if (!region.unassigned) {
       fact(facts, "Population", region.population
-        ? [element("span", "fact-value", people(region.population.count)), element("span", "card-year", String(region.population.year))]
-        : [noData()]);
-      fact(facts, "GDP", region.gdp
-        ? [element("span", "fact-value", money(region.gdp.usd)), element("span", "card-year", String(region.gdp.year))]
-        : [noData()]);
+        ? { figure: people(region.population.count), year: region.population.year } : noData);
+      fact(facts, "GDP", region.gdp ? { figure: money(region.gdp.usd), year: region.gdp.year } : noData);
+      if (region.capital) fact(facts, "Capital", { text: region.capital.name, note: region.capital.note, mark: "capital" });
       const languages = region.languages ?? { list: [] };
-      fact(facts, languages.list.length === 1 ? "Official language" : "Official languages", [
-        languages.list.length ? document.createTextNode(languages.list.join(", ")) : element("span", "", "None"),
-        languages.note ? element("span", "fact-note", languages.note) : null,
-      ]);
+      fact(facts, languages.list.length === 1 ? "Official language" : "Official languages",
+        { text: languages.list.length ? languages.list.join(", ") : "None", note: languages.note });
+      const religion = region.religion;
+      fact(facts, "Main religion", religion ? {
+        text: religion.name,
+        figure: religion.share === null ? "" : percent(religion.share),
+        year: religion.share === null ? null : religion.year,
+        note: religion.next ? `Next largest: ${groupInText(religion.next.name)}, ${percent(religion.next.share)}` : "",
+      } : noData);
       for (const [key, label] of [["highest", "Highest point"], ["lowest", "Lowest point"]]) {
         const point = region[key];
-        fact(facts, label, point
-          ? [document.createTextNode(`${point.name} `), element("span", "fact-value", metres(point.m))]
-          : [noData()], point?.at ? key : null);
+        fact(facts, label, point ? { text: point.name, figure: metres(point.m), mark: point.at ? key : null } : noData);
       }
       const lake = region.lake;
-      const lakeNote = lake && [lake.kind ? capital(lake.kind) : "", lake.shared?.length ? `Shared with ${lake.shared.join(", ")}` : "",
-        lake.km2 === null ? "The area is not recorded" : ""].filter(Boolean).join(". ");
-      fact(facts, "Largest lake", lake
-        ? [document.createTextNode(`${lake.name} `), area(lake) ? element("span", "fact-value", area(lake)) : null,
-          lakeNote ? element("span", "fact-note", lakeNote) : null]
-        : [element("span", "", "None recorded")], lake && (lake.outline || lake.at) ? "lake" : null);
+      fact(facts, "Largest lake", lake ? {
+        text: lake.name,
+        figure: area(lake),
+        note: [lake.kind ? capital(lake.kind) : "", lake.shared?.length ? `Shared with ${lake.shared.join(", ")}` : "",
+          lake.km2 === null ? "The area is not recorded" : ""].filter(Boolean).join(". "),
+        mark: lake.outline || lake.at ? "lake" : null,
+      } : noneRecorded);
+      const river = region.river;
+      fact(facts, "Longest river", river ? {
+        text: river.name,
+        figure: river.km === null ? "" : `${integer.format(river.km)} km`,
+        note: river.shared.length ? `Also flows through ${listText(river.shared)}` : "",
+        mark: river.drawn ? "river" : null,
+      } : noneRecorded);
       const disaster = region.disaster;
-      const deaths = disaster && `${integer.format(disaster.deaths)} ${disaster.deaths === 1 ? "death" : "deaths"}`;
-      fact(facts, "Deadliest disaster since 1900", disaster
-        ? [document.createTextNode(`${disaster.name ?? `${disaster.type}, ${disaster.year}`} `), element("span", "fact-value", deaths),
-          disaster.name ? element("span", "fact-note", `${disaster.type}, ${disaster.year}`) : null]
-        : [element("span", "", "None recorded")]);
+      fact(facts, "Deadliest disaster since 1900", disaster ? {
+        text: disaster.name ?? `${disaster.type}, ${disaster.year}`,
+        figure: `${integer.format(disaster.deaths)} ${disaster.deaths === 1 ? "death" : "deaths"}`,
+        note: disaster.name ? `${disaster.type}, ${disaster.year}` : "",
+      } : noneRecorded);
     }
 
     const exportsList = document.getElementById("export-list");
@@ -584,9 +689,11 @@
     cities.forEach((city, index) => {
       const row = element("tr");
       row.dataset.index = String(index);
+      const name = element("td", "", city[0]);
+      if (region.capital?.city === index) name.append(symbol("capital"), element("span", "sr-only", " (capital)"));
       row.append(
         element("td", "", String(index + 1)),
-        element("td", "", city[0]),
+        name,
         element("td", "num", integer.format(city[1])),
         element("td", "num year", city[2] ? String(city[2]) : ""),
       );
@@ -599,7 +706,8 @@
     if (!region.unassigned) {
       const gdpSource = region.gdp ? `GDP: ${region.gdp.source}. ` : "";
       const disasterSource = region.disaster ? `Disaster: ${region.disaster.source === "EM-DAT" ? "EM-DAT" : region.disaster.source}. ` : "";
-      sources.append(document.createTextNode(`${gdpSource}${disasterSource}Cities: GeoNames and Wikidata. Other values: The World Factbook and Wikidata. `));
+      const religionSource = region.religion ? `Religion: ${region.religion.source}. ` : "";
+      sources.append(document.createTextNode(`${gdpSource}${religionSource}${disasterSource}Cities and capital: GeoNames and Wikidata. Other values: The World Factbook and Wikidata. `));
       const link = element("a", "", "Sources and method");
       link.href = "#sources";
       sources.append(link);
@@ -717,8 +825,9 @@
     if (hoverFrame) return;
     hoverFrame = requestAnimationFrame(() => {
       hoverFrame = 0;
-      const mark = marks.find(entry => (entry.x - x) ** 2 + (entry.y - y) ** 2 <= entry.r ** 2);
+      let mark = marks.find(entry => (entry.x - x) ** 2 + (entry.y - y) ** 2 <= entry.r ** 2);
       if (mark || pointedMark) pointAt(mark);
+      if (!mark && onRiver(x, y)) mark = { x, y, label: `Longest river: ${regions[selected]?.river?.name ?? ""}` };
       if (mark) {
         canvas.classList.remove("is-pointing");
         if (hovered) { hovered = null; requestRender(); }
@@ -849,7 +958,7 @@
     readColors();
     measure();
     try {
-      const [topology, data, simple, lakes] = await Promise.all(["data/world.json", "data/countries.json", "data/world-coarse.json", "data/lakes.json"].map(async url => {
+      const [topology, data, simple, lakes, rivers] = await Promise.all(["data/world.json", "data/countries.json", "data/world-coarse.json", "data/lakes.json", "data/rivers.json"].map(async url => {
         const response = await fetch(url);
         if (!response.ok) throw new Error(`${url}: ${response.status}`);
         return response.json();
@@ -878,6 +987,10 @@
           if (!lakeShapes.byRegion.has(id)) lakeShapes.byRegion.set(id, { type: "FeatureCollection", features: [] });
           lakeShapes.byRegion.get(id).features.push(lake);
         }
+      }
+      riverShapes = new Map();
+      for (const river of topojson.feature(rivers, rivers.objects.rivers).features) {
+        for (const id of river.properties.regions) riverShapes.set(id, river);
       }
       coarse = {
         land: topojson.feature(simple, simple.objects.land),

@@ -180,15 +180,24 @@
   font: var(--text-ui, .875rem)/1.45 var(--ui, var(--serif));
 }
 .card-facts dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: .75rem;
   margin: 0;
   font: var(--text-ui, .875rem)/1.45 var(--serif);
-  overflow-wrap: anywhere;
 }
+.fact-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.fact-text--empty { color: var(--muted); }
+/* Figures end at the right edge, so values line up from row to row. A figure moves
+   below a long text instead of squeezing it. */
+.fact-figure { margin-left: auto; font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
 .card-facts > :nth-last-child(-n + 2) { border-bottom: 0; }
-.fact-value { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .fact-symbol { width: .7rem; height: .7rem; margin-right: .4rem; vertical-align: -.02rem; fill: var(--ink); }
 .fact-symbol--lake { fill: var(--blue); }
-.fact-note { display: block; margin-top: .1rem; }
+.fact-symbol--river { fill: none; stroke: var(--blue); stroke-width: 1.6; stroke-linecap: round; }
+.city-table .fact-symbol { margin: 0 0 0 .35rem; }
+.fact-note { flex: 0 0 100%; margin-top: .1rem; }
 
 .card-year {
   margin-left: .3rem;

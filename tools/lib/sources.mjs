@@ -14,6 +14,7 @@ export const paths = {
   naturalEarthMarine: `${cache}naturalearth/ne_50m_geography_marine_polys.geojson`,
   geonamesZip: `${cache}geonames/cities500.zip`,
   geonames: `${cache}geonames/cities500.txt`,
+  geonamesCountries: `${cache}geonames/countryInfo.txt`,
   factbookArchive: `${cache}factbook/factbook.tar.gz`,
   factbook: `${cache}factbook/factbook.json-master/`,
   worldBank: `${cache}worldbank/gdp.json`,
@@ -25,11 +26,34 @@ export const paths = {
   imf: `${cache}imf/ngdpd.json`,
   wikidataCities: `${cache}wikidata/cities.json`,
   wikidataLakes: `${cache}wikidata/lakes.json`,
+  wikidataRivers: `${cache}wikidata/rivers.json`,
+  naturalEarthRivers: ['ne_10m_rivers_lake_centerlines', 'ne_10m_rivers_europe', 'ne_10m_rivers_north_america']
+    .map(name => `${cache}naturalearth/${name}.geojson`),
+  religionZip: `${cache}pew/religious-composition.zip`,
+  religion: `${cache}pew/Religious Composition 2010-2020 dataset/Religious Composition 2010-2020 (percentages).csv`,
   manifest: `${cache}manifest.json`,
 };
 
 export function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
+}
+
+// Rows of a CSV file. Quoted cells can hold commas.
+export function csvRows(text) {
+  const rows = [];
+  for (const line of text.replace(/^﻿/, '').split(/\r?\n/)) {
+    if (!line) continue;
+    const cells = [];
+    let cell = '', quoted = false;
+    for (const char of line) {
+      if (char === '"') quoted = !quoted;
+      else if (char === ',' && !quoted) { cells.push(cell); cell = ''; }
+      else cell += char;
+    }
+    cells.push(cell);
+    rows.push(cells);
+  }
+  return rows;
 }
 
 export function requireFile(path) {

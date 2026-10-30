@@ -3,6 +3,7 @@
 // name an EM-DAT entry when the country, year and type agree. Droughts are left out,
 // because their death tolls are mostly deaths from famine.
 import { readFileSync } from 'node:fs';
+import { csvRows } from './sources.mjs';
 
 export const emdatTypes = {
   earthquake: 'Earthquake', volcanic_activity: 'Volcanic eruption', flood: 'Flood', landslide: 'Landslide',
@@ -19,23 +20,6 @@ const rootsFor = {
 // For the successor states, a Wikidata event in the country can be the deadliest.
 export const successorStates = new Set(['ARM', 'AZE', 'BLR', 'EST', 'GEO', 'KAZ', 'KGZ', 'LVA', 'LTU', 'MDA', 'RUS',
   'TJK', 'TKM', 'UKR', 'UZB', 'BIH', 'HRV', 'MKD', 'MNE', 'SRB', 'SVN', 'XKX', 'CZE', 'SVK', 'DEU', 'YEM']);
-
-function csvRows(text) {
-  const rows = [];
-  for (const line of text.split('\n')) {
-    if (!line) continue;
-    const cells = [];
-    let cell = '', quoted = false;
-    for (const char of line) {
-      if (char === '"') quoted = !quoted;
-      else if (char === ',' && !quoted) { cells.push(cell); cell = ''; }
-      else cell += char;
-    }
-    cells.push(cell);
-    rows.push(cells);
-  }
-  return rows;
-}
 
 // EM-DAT entries by ISO 3166 alpha-3 code: [{ year, type, deaths }].
 export function readEmdat(path) {

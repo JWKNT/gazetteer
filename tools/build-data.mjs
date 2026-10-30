@@ -9,6 +9,8 @@ import { rankCities } from './lib/cities.mjs';
 import { indexWikidataLakes, largestLake } from './lib/lakes.mjs';
 import { loadLakeLayers, findLakeShapes, mapLakes, lakeTopology } from './lib/lake-shapes.mjs';
 import { readEmdat, deadliestDisaster } from './lib/disasters.mjs';
+import { readPew, readM49, factbookShares, mainReligion, groupNames } from './lib/religion.mjs';
+import { loadRiverLines, splitLines, shapeIndex, linkLines, lengthKm, riverTopology } from './lib/rivers.mjs';
 import { feature } from 'topojson-client';
 import { geoContains, geoCentroid } from 'd3-geo';
 
@@ -18,6 +20,9 @@ const languages = curated('languages');
 const elevationFixes = curated('elevation');
 const cityFixes = curated('cities');
 const lakeFixes = curated('lakes');
+const capitalFixes = curated('capitals');
+const religionFixes = curated('religion');
+const riverFixes = curated('rivers');
 
 const regions = loadRegions();
 
@@ -147,6 +152,54 @@ const wikidataDisasters = readJson(requireFile(paths.wikidataDisasters));
 const tollsByRegion = byRegion(wikidataDisasters.tolls);
 const eventsByRegion = byRegion(wikidataDisasters.events);
 
+/* Religion: Pew Research Center for 2020, then The World Factbook. */
+const pew = readPew(requireFile(paths.religion));
+const m49 = readM49(requireFile(paths.geonamesCountries));
+function religionOf(region, entries) {
+  const counted = pew.get(m49.get(region.id));
+  const found = counted
+    ? { shares: counted.shares, year: 2020, source: 'Pew Research Center' }
+    : entries.map(factbookShares).filter(Boolean).map(result => ({ ...result, source: 'The World Factbook' }))[0];
+  const main = found?.first ? { name: groupNames[found.first], share: null } : found && mainReligion(found.shares);
+  if (!main) return null;
+  if (religionFixes[region.id]?.name) main.name = religionFixes[region.id].name;
+  return { ...main, year: found.year, source: found.source };
+}
+
+/* Rivers: the longest Wikidata river with a Natural Earth line through or along the
+   region. A region without such a line gets its longest Wikidata river, which the
+   globe does not draw. */
+const wikidataRivers = readJson(requireFile(paths.wikidataRivers));
+const riverLinks = linkLines(splitLines(loadRiverLines(paths.naturalEarthRivers), riverFixes._split), wikidataRivers,
+  shapeIndex(feature(world, world.objects.countries).features), riverFixes._join);
+const riverRegions = new Map([...riverLinks].map(([item, lines]) => [item, new Set(lines.flatMap(line => [...line.regions]))]));
+// A reviewed river of a region also lists that region among its countries.
+for (const [id, fix] of Object.entries(riverFixes)) if (fix?.item && riverRegions.has(fix.item)) riverRegions.get(fix.item).add(id);
+const drawnRivers = new Map();
+const regionNames = new Map(regions.map(region => [region.id, region.name]));
+function riverOf(region) {
+  const fix = riverFixes[region.id];
+  if (fix === null) return null;
+  // A reviewed river without a Wikidata length, with the length from its source.
+  if (fix?.name && !fix.item) return { name: fix.name, km: fix.km ?? null, shared: [] };
+  const longest = ids => ids.sort((a, b) => lengthKm(wikidataRivers[b]) - lengthKm(wikidataRivers[a]))[0];
+  const drawn = [...riverRegions].filter(([, through]) => through.has(region.id)).map(([item]) => item);
+  const item = fix?.item ?? longest(drawn) ?? longest(Object.keys(wikidataRivers).filter(id => wikidataRivers[id].regions.includes(region.id)));
+  if (!item) return null;
+  const river = wikidataRivers[item];
+  const through = riverRegions.get(item) ?? new Set(river.regions);
+  if (riverLinks.has(item)) {
+    if (!drawnRivers.has(item)) drawnRivers.set(item, { lines: riverLinks.get(item), regions: new Set() });
+    drawnRivers.get(item).regions.add(region.id);
+  }
+  return {
+    name: fix?.name ?? riverFixes._names?.[item] ?? river.label ?? river.names[0],
+    km: fix?.km ?? lengthKm(river),
+    shared: [...through].filter(id => id !== region.id && regionNames.has(id)).map(id => regionNames.get(id)).sort(),
+    ...(riverLinks.has(item) ? { drawn: true } : {}),
+  };
+}
+
 /* Exports: the Factbook list of the five largest commodities by value. */
 function exportsOf(entries) {
   const found = entries.map(factbook.exports).find(Boolean);
@@ -161,8 +214,26 @@ const cityFacts = readJson(requireFile(paths.wikidataCities));
 function cities(region) {
   const candidates = region.geonames.flatMap(code => pool.get(code) ?? []);
   candidates.sort((a, b) => b.population - a.population);
-  return rankCities(candidates, cityFacts, cityFixes).map(city =>
-    [city.name, city.population, city.year, Math.round(city.lat * 1000) / 1000, Math.round(city.lon * 1000) / 1000]);
+  return rankCities(candidates, cityFacts, cityFixes);
+}
+
+/* Capitals: the GeoNames capital of the region's main country code, with reviewed
+   changes. A capital among the ten cities points to its row. Another capital gets a
+   position of its own. */
+const capitalByCountry = new Map(geonames.filter(row => row.code === 'PPLC').map(row => [row.country, row]));
+const placeById = new Map(geonames.map(row => [row.geonameId, row]));
+function capitalOf(region, ranked) {
+  if (capitalFixes[region.id] === null) return null;
+  const fix = capitalFixes[region.id] ?? {};
+  const place = fix.at ? null : placeById.get(fix.geonameId) ?? capitalByCountry.get(region.geonames[0]);
+  if (!place && !fix.at) return null;
+  const index = place ? ranked.findIndex(city => city.geonameId === place.geonameId) : -1;
+  const name = fix.name ?? (index >= 0 ? ranked[index].name : place.name);
+  return {
+    name,
+    ...(index >= 0 ? { city: index } : { at: round3(fix.at ?? [place.lon, place.lat]) }),
+    ...(fix.note ? { note: fix.note } : {}),
+  };
 }
 
 /* Lakes */
@@ -189,9 +260,13 @@ for (const region of regions) {
     output[region.id] = record;
     continue;
   }
+  const ranked = cities(region);
   record.population = population(region, entries);
   record.gdp = gdp(region, entries);
+  const capital = capitalOf(region, ranked);
+  if (capital) record.capital = capital;
   record.languages = languagesOf(region);
+  record.religion = religionOf(region, entries);
   Object.assign(record, elevation(region, entries));
   const lakeFix = lakeFixes[region.id];
   record.lake = lakeFix !== undefined
@@ -207,6 +282,7 @@ for (const region of regions) {
     delete record.lake.source;
     delete record.lake.item;
   }
+  record.river = riverOf(region);
   const fix = disasterFixes[region.id];
   record.disaster = deadliestDisaster({ id: region.id, emdatCodes: [region.worldBank, ...(emdatExtra[region.id] ?? [])] },
     emdat, tollsByRegion.get(region.id) ?? [], eventsByRegion.get(region.id) ?? [],
@@ -217,11 +293,13 @@ for (const region of regions) {
     if (fix.type) record.disaster.type = fix.type;
   }
   record.exports = exportsOf(entries);
-  record.cities = cities(region);
+  record.cities = ranked.map(city =>
+    [city.name, city.population, city.year, Math.round(city.lat * 1000) / 1000, Math.round(city.lon * 1000) / 1000]);
   output[region.id] = record;
 }
 
 writeFileSync(`${root}data/lakes.json`, JSON.stringify(lakeTopology(lakeShapes)));
+writeFileSync(`${root}data/rivers.json`, JSON.stringify(riverTopology([...drawnRivers.values()])));
 
 // One region per line keeps the file small and its history readable.
 const lines = Object.entries(output).map(([id, record]) => `${JSON.stringify(id)}:${JSON.stringify(record)}`);

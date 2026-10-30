@@ -116,6 +116,64 @@ test('population, disasters and positions are present and plausible', () => {
   assert.ok(Math.abs(lon + 151) < 1 && Math.abs(lat - 63) < 1, 'Denali is in Alaska');
 });
 
+test('capitals point to a city row or have a position of their own', () => {
+  for (const [id, region] of Object.entries(regions)) {
+    const capital = region.capital;
+    if (!capital) continue;
+    assert.ok(capital.name, `${id} capital name`);
+    if (capital.city !== undefined) assert.ok(region.cities[capital.city], `${id} capital row`);
+    else assert.ok(Math.abs(capital.at[0]) <= 180 && Math.abs(capital.at[1]) <= 90, `${id} capital position`);
+  }
+  assert.equal(regions.FRA.cities[regions.FRA.capital.city][0], 'Paris');
+  assert.equal(regions.USA.capital.name, 'Washington');
+  assert.ok(regions.USA.capital.at, 'Washington is not one of the ten largest US cities');
+  assert.equal(regions.TZA.cities[regions.TZA.capital.city][0], 'Dodoma');
+  assert.ok(regions.NLD.capital.note && regions.ISR.capital.note);
+  for (const id of ['HKG', 'MAC', 'ESH']) assert.equal(regions[id].capital, undefined, id);
+  assert.ok(Object.values(regions).filter(region => region.capital).length >= 225);
+});
+
+test('religion gives the largest group and its share', () => {
+  for (const [id, region] of Object.entries(regions)) {
+    const religion = region.religion;
+    if (!religion) continue;
+    assert.ok(religion.name && religion.source, `${id} religion`);
+    if (religion.share !== null) assert.ok(religion.share > 0 && religion.share <= 100, `${id} religion share`);
+    if (religion.next) assert.ok(religion.next.share <= religion.share, `${id} next group is smaller`);
+  }
+  assert.equal(regions.IND.religion.name, 'Hinduism');
+  assert.equal(regions.SAU.religion.name, 'Islam');
+  assert.equal(regions.CHN.religion.name, 'No religion');
+  assert.equal(regions.CHN.religion.next.name, 'Buddhism');
+  assert.equal(regions.USA.religion.year, 2020);
+  assert.ok(Object.values(regions).filter(region => region.religion).length >= 225);
+});
+
+test('disasters have names where the sources give one', () => {
+  const records = Object.values(regions).filter(region => region.disaster);
+  assert.ok(records.filter(region => region.disaster.name).length >= 180);
+  assert.equal(regions.BHS.disaster.name, 'Hurricane Dorian');
+  assert.equal(regions.PNG.disaster.type, 'Volcanic eruption');
+});
+
+test('each drawn river has a line, and lengths are plausible', () => {
+  const rivers = JSON.parse(read('data/rivers.json'));
+  const drawn = new Set(rivers.objects.rivers.geometries.flatMap(shape => shape.properties.regions));
+  for (const [id, region] of Object.entries(regions)) {
+    const river = region.river;
+    if (!river) continue;
+    assert.ok(river.name && (river.km === null || (river.km > 0 && river.km <= 7000)), `${id} river ${river.name} ${river.km}`);
+    assert.equal(Boolean(river.drawn), drawn.has(id), `${id} river line`);
+    assert.ok(!river.shared.includes(region.name), `${id} river countries`);
+  }
+  assert.equal(regions.EGY.river.name, 'Nile');
+  assert.equal(regions.BRA.river.name, 'Amazon River');
+  assert.equal(regions.CHN.river.name, 'Yangtze River');
+  assert.ok(regions.DEU.river.shared.includes('Ukraine'), 'a reviewed river lists its region');
+  assert.equal(regions.BOL.river.name, 'Paraguay River');
+  assert.ok(read('data/rivers.json').length < 300 * 1024);
+});
+
 test('each outlined lake has a shape, and the globe has map lakes', () => {
   const lakes = JSON.parse(read('data/lakes.json'));
   const shapes = lakes.objects.lakes.geometries;

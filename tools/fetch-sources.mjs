@@ -1,6 +1,6 @@
 // Download the source snapshot into .cache/. Run: npm run fetch [-- step ...]
 // Steps: geography, geonames, factbook, gdp, population, cities, lakes, lakepoints,
-// extremes, disasters. Without a step, run all. Later steps read earlier results.
+// extremes, disasters, religion. Without a step, run all. Later steps read earlier results.
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname } from 'node:path';
@@ -23,12 +23,13 @@ const steps = {
   async geography() {
     await download(`${naturalEarth}ne_50m_admin_0_countries.geojson`, paths.naturalEarth);
     await download(`${naturalEarth}ne_10m_admin_0_countries.geojson`, paths.naturalEarthDetail);
-    for (const path of [...paths.naturalEarthLakes, paths.naturalEarthMarine]) await download(`${naturalEarth}${path.split('/').pop()}`, path);
+    for (const path of [...paths.naturalEarthLakes, paths.naturalEarthMarine, ...paths.naturalEarthRivers]) await download(`${naturalEarth}${path.split('/').pop()}`, path);
   },
 
   async geonames() {
     await download('https://download.geonames.org/export/dump/cities500.zip', paths.geonamesZip);
     execFileSync('unzip', ['-o', '-q', paths.geonamesZip, '-d', dirname(paths.geonames)]);
+    await download('https://download.geonames.org/export/dump/countryInfo.txt', paths.geonamesCountries);
   },
 
   async factbook() {
@@ -310,6 +311,80 @@ const steps = {
     }
     writeFileSync(paths.wikidataDisasters, JSON.stringify({ tolls: details, events: [...merged.values()] }));
     console.log(`Disasters: ${details.length} events with a death toll, ${merged.size} events since 1900`);
+  },
+
+  // The 300 longest Wikidata rivers of each region, with their lengths in metres and
+  // their names in all languages. The names identify the Natural Earth river lines.
+  async rivers() {
+    const regions = loadRegions().filter(region => region.wikidata);
+    // A large country has many thousands of rivers with a length. Rivers of 100 km or more
+    // keep its query short. A country with few such rivers gets all of its rivers.
+    const query = (item, minimum) => sparql(`SELECT ?river ?meters ?rank WHERE {
+      ?river wdt:P17 wd:${item} ; wdt:P31 wd:Q4022 ; p:P2043 ?length .
+      ?length psn:P2043/wikibase:quantityAmount ?meters ; wikibase:rank ?rank .
+      FILTER(?rank != wikibase:DeprecatedRank && ?meters >= ${minimum})
+    } ORDER BY DESC(?meters) LIMIT 300`);
+    // Results so far, so that a failed run can continue where it stopped.
+    const partial = `${paths.wikidataRivers}.regions.json`;
+    const byRegion = existsSync(partial) ? readJson(partial) : {};
+    for (const region of regions) {
+      if (byRegion[region.id]) continue;
+      let rows = await query(region.wikidata, 100000);
+      if (rows.length < 20) rows = await query(region.wikidata, 0);
+      byRegion[region.id] = rows.map(row => [qid(row.river.value), Number(row.meters.value), row.rank.value.endsWith('PreferredRank')]);
+      writeFileSync(partial, JSON.stringify(byRegion));
+      console.log(`Rivers: ${region.id} ${rows.length}`);
+    }
+    // Some long rivers belong to a subclass of river, such as "main stem" (the Zambezi).
+    // These classes have few items, so one query for each class covers all countries.
+    // Wadis and arroyos are dry most of the year and are not included.
+    const regionByItem = new Map(regions.map(region => [region.wikidata, region.id]));
+    const subclasses = ['Q573344', 'Q4366834', 'Q108822533', 'Q98242145', 'Q98242280', 'Q12099220', 'Q16465938',
+      'Q1074069', 'Q11514609', 'Q3073652', 'Q115327931', 'Q4733366', 'Q56297530', 'Q590219'];
+    for (const kind of subclasses) {
+      const rows = await sparql(`SELECT ?river ?meters ?rank ?country WHERE {
+        ?river wdt:P31 wd:${kind} ; wdt:P17 ?country ; p:P2043 ?length .
+        ?length psn:P2043/wikibase:quantityAmount ?meters ; wikibase:rank ?rank .
+        FILTER(?rank != wikibase:DeprecatedRank && ?meters >= 20000)
+      }`);
+      for (const row of rows) {
+        const id = regionByItem.get(qid(row.country.value));
+        if (!id) continue;
+        byRegion[id] ??= [];
+        const entry = [qid(row.river.value), Number(row.meters.value), row.rank.value.endsWith('PreferredRank')];
+        if (!byRegion[id].some(known => known.join() === entry.join())) byRegion[id].push(entry);
+      }
+      console.log(`Rivers: class ${kind} ${rows.length}`);
+    }
+    const rivers = {};
+    for (const [id, rows] of Object.entries(byRegion)) {
+      for (const [item, m, preferred] of rows) {
+        const river = rivers[item] ??= { lengths: [], regions: [], names: [] };
+        if (!river.lengths.some(length => length.m === m && length.preferred === preferred)) river.lengths.push({ m, preferred });
+        if (!river.regions.includes(id)) river.regions.push(id);
+      }
+    }
+    const ids = Object.keys(rivers);
+    for (let start = 0; start < ids.length; start += 250) {
+      const rows = await sparql(`SELECT ?river ?kind ?name WHERE {
+        VALUES ?river { ${ids.slice(start, start + 250).map(id => `wd:${id}`).join(' ')} }
+        VALUES ?kind { rdfs:label skos:altLabel }
+        ?river ?kind ?name .
+      }`);
+      for (const row of rows) {
+        const river = rivers[qid(row.river.value)];
+        if (row.kind.value.endsWith('#label') && row.name['xml:lang'] === 'en') river.label = row.name.value;
+        if (!river.names.includes(row.name.value)) river.names.push(row.name.value);
+      }
+    }
+    writeFileSync(paths.wikidataRivers, JSON.stringify(rivers));
+    console.log(`Rivers: ${ids.length} rivers with a length`);
+  },
+
+  // Pew Research Center: religious composition of 201 countries and territories, 2010 and 2020.
+  async religion() {
+    await download('https://www.pewresearch.org/wp-content/uploads/sites/20/2025/06/Religious-Composition-2010-2020-dataset.zip', paths.religionZip);
+    execFileSync('unzip', ['-o', '-q', paths.religionZip, '-d', dirname(paths.religionZip)]);
   },
 };
 

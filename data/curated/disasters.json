@@ -1,35 +1,144 @@
 {
   "_about": "Reviewed corrections to the deadliest natural disaster since 1900. An entry with 'deaths' replaces the record and gives its source. An entry without 'deaths' names an EM-DAT record of the same year, where Wikidata gives no country for the event or names the wrong one.",
-  "TKM": {
-    "name": "1948 Ashgabat earthquake",
-    "type": "Earthquake",
-    "year": 1948,
-    "deaths": 110000,
-    "source": "USGS significant earthquakes"
+  "_method": "Names are Wikipedia article titles where one exists. Other names follow the same pattern of year, place and type, with the place from the GLIDE record (glidenumber.net) or the Wikipedia cyclone season summary. EM-DAT gives yearly totals, so a name gives the event that caused most of the deaths.",
+  "AIA": {
+    "year": 1960,
+    "name": "Hurricane Donna",
+    "type": "Hurricane"
+  },
+  "ALB": {
+    "year": 2023,
+    "name": "2023 European heat waves",
+    "type": "Heat wave"
+  },
+  "ASM": {
+    "year": 1966,
+    "name": "1966 Samoa cyclone",
+    "type": "Tropical cyclone"
+  },
+  "ATG": {
+    "year": 1950,
+    "name": "Hurricane Dog",
+    "type": "Hurricane"
+  },
+  "AUT": {
+    "year": 2024,
+    "name": "2024 European heat waves",
+    "type": "Heat wave"
+  },
+  "BDI": {
+    "year": 2014,
+    "name": "2014 Bujumbura floods",
+    "type": "Flood"
+  },
+  "BEL": {
+    "year": 2020,
+    "name": "August 2020 European heat wave",
+    "type": "Heat wave"
+  },
+  "BFA": {
+    "year": 2007,
+    "name": "2007 African floods",
+    "type": "Flood"
   },
   "BGD": {
     "year": 1970,
     "name": "1970 Bhola cyclone",
     "type": "Tropical cyclone"
   },
-  "MMR": {
-    "year": 2008,
-    "name": "Cyclone Nargis",
-    "type": "Tropical cyclone"
+  "BGR": {
+    "year": 2024,
+    "name": "2024 European heat waves",
+    "type": "Heat wave"
   },
-  "PHL": {
-    "year": 2013,
-    "name": "Typhoon Haiyan",
-    "type": "Typhoon"
+  "BHS": {
+    "year": 2019,
+    "name": "Hurricane Dorian",
+    "type": "Hurricane"
   },
-  "VEN": {
-    "year": 1999,
-    "name": "Vargas tragedy",
+  "BIH": {
+    "year": 2024,
+    "name": "2024 European heat waves",
+    "type": "Heat wave"
+  },
+  "BLM": {
+    "year": 2017,
+    "name": "Hurricane Irma",
+    "type": "Hurricane"
+  },
+  "BLR": {
+    "year": 2017,
+    "name": "January 2017 European cold wave",
+    "type": "Cold wave"
+  },
+  "BLZ": {
+    "year": 1931,
+    "name": "1931 British Honduras hurricane",
+    "type": "Hurricane"
+  },
+  "BMU": {
+    "year": 2003,
+    "name": "Hurricane Fabian",
+    "type": "Hurricane"
+  },
+  "BRB": {
+    "year": 1955,
+    "name": "Hurricane Janet",
+    "type": "Hurricane"
+  },
+  "BTN": {
+    "year": 2000,
+    "name": "2000 Phuentsholing floods",
     "type": "Flood"
   },
-  "RUS": {
-    "year": 2010,
-    "name": "2010 Russian heat wave",
+  "CHE": {
+    "year": 2003,
+    "name": "2003 European heat wave",
+    "type": "Heat wave"
+  },
+  "CIV": {
+    "year": 2014,
+    "name": "June 2014 Abidjan floods",
+    "type": "Flood"
+  },
+  "CMR": {
+    "year": 1986,
+    "name": "Lake Nyos disaster",
+    "type": "Limnic eruption"
+  },
+  "COK": {
+    "year": 1997,
+    "name": "Cyclone Martin",
+    "type": "Tropical cyclone"
+  },
+  "COM": {
+    "year": 1951,
+    "name": "1951 Comoros cyclone",
+    "type": "Tropical cyclone"
+  },
+  "CPV": {
+    "year": 1984,
+    "name": "Tropical Storm Fran",
+    "type": "Tropical storm"
+  },
+  "CUB": {
+    "year": 1932,
+    "name": "1932 Cuba hurricane",
+    "type": "Hurricane"
+  },
+  "CYM": {
+    "year": 1932,
+    "name": "1932 Cuba hurricane",
+    "type": "Hurricane"
+  },
+  "CYP": {
+    "year": 2024,
+    "name": "2024 European heat waves",
+    "type": "Heat wave"
+  },
+  "CZE": {
+    "year": 2024,
+    "name": "2024 European heat waves",
     "type": "Heat wave"
   },
   "DEU": {
@@ -37,104 +146,445 @@
     "name": "2003 European heat wave",
     "type": "Heat wave"
   },
-  "CHE": {
-    "year": 2003,
-    "name": "2003 European heat wave",
+  "DNK": {
+    "year": 2022,
+    "name": "2022 European heat waves",
     "type": "Heat wave"
-  },
-  "PRT": {
-    "year": 2003,
-    "name": "2003 European heat wave",
-    "type": "Heat wave"
-  },
-  "HKG": {
-    "year": 1937,
-    "name": "1937 Hong Kong typhoon",
-    "type": "Typhoon"
-  },
-  "CMR": {
-    "year": 1986,
-    "name": "Lake Nyos disaster",
-    "type": "Limnic eruption"
-  },
-  "VCT": {
-    "year": 1902,
-    "name": "1902 eruption of La Soufrière",
-    "type": "Volcanic eruption"
-  },
-  "BLZ": {
-    "year": 1931,
-    "name": "1931 British Honduras hurricane",
-    "type": "Hurricane"
-  },
-  "CUB": {
-    "year": 1932,
-    "name": "1932 Cuba hurricane",
-    "type": "Hurricane"
   },
   "DOM": {
     "year": 1930,
     "name": "1930 Dominican Republic hurricane",
     "type": "Hurricane"
   },
+  "DZA": {
+    "year": 1927,
+    "name": "1927 Algeria floods",
+    "type": "Flood"
+  },
+  "EGY": {
+    "year": 1994,
+    "name": "1994 Durunka floods",
+    "type": "Flood"
+  },
+  "ESP": {
+    "year": 2003,
+    "name": "2003 European heat wave",
+    "type": "Heat wave"
+  },
+  "EST": {
+    "year": 2022,
+    "name": "2022 European heat waves",
+    "type": "Heat wave"
+  },
+  "ETH": {
+    "year": 2006,
+    "name": "2006 Dire Dawa and Omo floods",
+    "type": "Flood"
+  },
+  "FIN": {
+    "year": 2022,
+    "name": "2022 European heat waves",
+    "type": "Heat wave"
+  },
+  "FJI": {
+    "year": 1931,
+    "name": "1931 Fiji hurricane",
+    "type": "Tropical cyclone"
+  },
+  "FSM": {
+    "year": 2002,
+    "name": "Typhoon Chataan",
+    "type": "Typhoon"
+  },
+  "GAB": {
+    "year": 2012,
+    "name": "2012 Libreville flood",
+    "type": "Flood"
+  },
+  "GMB": {
+    "year": 1999,
+    "name": "1999 Gambia floods",
+    "type": "Flood"
+  },
+  "GRC": {
+    "year": 2024,
+    "name": "2024 European heat waves",
+    "type": "Heat wave"
+  },
+  "GRD": {
+    "year": 2004,
+    "name": "Hurricane Ivan",
+    "type": "Hurricane"
+  },
+  "GUM": {
+    "year": 2004,
+    "name": "Tropical Storm Tingting",
+    "type": "Tropical storm"
+  },
+  "GUY": {
+    "year": 2005,
+    "name": "2005 Georgetown flood",
+    "type": "Flood"
+  },
+  "HKG": {
+    "year": 1937,
+    "name": "1937 Hong Kong typhoon",
+    "type": "Typhoon"
+  },
+  "HRV": {
+    "year": 2024,
+    "name": "2024 European heat waves",
+    "type": "Heat wave"
+  },
+  "HUN": {
+    "year": 2024,
+    "name": "2024 European heat waves",
+    "type": "Heat wave"
+  },
+  "IND": {
+    "year": 1935,
+    "type": "Cyclone"
+  },
+  "IRQ": {
+    "year": 2015,
+    "name": "2015 Baghdad floods",
+    "type": "Flood"
+  },
+  "ISL": {
+    "year": 1995,
+    "name": "Súðavík and Flateyri avalanches",
+    "type": "Avalanche"
+  },
+  "KIR": {
+    "year": 1972,
+    "name": "Cyclone Bebe",
+    "type": "Tropical cyclone"
+  },
+  "KNA": {
+    "year": 1998,
+    "name": "Hurricane Georges",
+    "type": "Hurricane"
+  },
+  "KOR": {
+    "year": 1936,
+    "name": "1936 Korea typhoon",
+    "type": "Typhoon"
+  },
+  "LBN": {
+    "year": 1955,
+    "name": "1955 Tripoli flood",
+    "type": "Flood"
+  },
+  "LCA": {
+    "year": 2010,
+    "name": "Hurricane Tomas",
+    "type": "Hurricane"
+  },
+  "LIE": {
+    "year": 2023,
+    "name": "2023 European heat waves",
+    "type": "Heat wave"
+  },
+  "LSO": {
+    "year": 2011,
+    "name": "2011 Lesotho floods",
+    "type": "Flood"
+  },
+  "LTU": {
+    "year": 2022,
+    "name": "2022 European heat waves",
+    "type": "Heat wave"
+  },
+  "LUX": {
+    "year": 2003,
+    "name": "2003 European heat wave",
+    "type": "Heat wave"
+  },
+  "LVA": {
+    "year": 2022,
+    "name": "2022 European heat waves",
+    "type": "Heat wave"
+  },
+  "MAC": {
+    "year": 1983,
+    "name": "Typhoon Ellen",
+    "type": "Typhoon"
+  },
+  "MAF": {
+    "year": 2017,
+    "name": "Hurricane Irma",
+    "type": "Hurricane"
+  },
+  "MDG": {
+    "year": 2004,
+    "name": "Cyclone Gafilo",
+    "type": "Tropical cyclone"
+  },
+  "MLT": {
+    "year": 2022,
+    "name": "2022 European heat waves",
+    "type": "Heat wave"
+  },
+  "MMR": {
+    "year": 2008,
+    "name": "Cyclone Nargis",
+    "type": "Tropical cyclone"
+  },
+  "MNE": {
+    "year": 2024,
+    "name": "2024 European heat waves",
+    "type": "Heat wave"
+  },
+  "MNP": {
+    "year": 2004,
+    "name": "Tropical Storm Tingting",
+    "type": "Tropical storm"
+  },
+  "MRT": {
+    "year": 2002,
+    "name": "January 2002 Mauritania floods",
+    "type": "Flood"
+  },
+  "MSR": {
+    "year": 1997,
+    "name": "1997 Soufrière Hills eruption",
+    "type": "Volcanic eruption"
+  },
+  "MUS": {
+    "year": 1960,
+    "name": "Cyclone Carol",
+    "type": "Tropical cyclone"
+  },
   "MWI": {
     "year": 2023,
     "name": "Cyclone Freddy",
     "type": "Tropical cyclone"
   },
-  "TON": {
-    "year": 2009,
-    "name": "2009 Samoa earthquake and tsunami",
-    "type": "Earthquake and tsunami"
+  "MYS": {
+    "year": 1996,
+    "name": "Tropical Storm Greg",
+    "type": "Tropical storm"
+  },
+  "NAM": {
+    "year": 2011,
+    "name": "2011 Namibia floods",
+    "type": "Flood"
+  },
+  "NCL": {
+    "year": 1981,
+    "name": "Cyclone Freda",
+    "type": "Tropical cyclone"
+  },
+  "NIU": {
+    "year": 2004,
+    "name": "Cyclone Heta",
+    "type": "Tropical cyclone"
   },
   "NOR": {
     "year": 1936,
     "name": "1936 Loen rockslide and tsunami",
     "type": "Tsunami"
   },
-  "AUT": {
-    "year": 2024,
-    "type": "Heat wave"
+  "OMN": {
+    "year": 1977,
+    "name": "1977 Oman cyclone",
+    "type": "Tropical cyclone"
   },
-  "BEL": {
+  "PAN": {
     "year": 2020,
-    "type": "Heat wave"
+    "name": "Hurricane Eta",
+    "type": "Hurricane"
   },
-  "BGR": {
-    "year": 2024,
-    "type": "Heat wave"
+  "PHL": {
+    "year": 2013,
+    "name": "Typhoon Haiyan",
+    "type": "Typhoon"
   },
-  "HRV": {
-    "year": 2024,
-    "type": "Heat wave"
-  },
-  "GRC": {
-    "year": 2024,
-    "type": "Heat wave"
-  },
-  "HUN": {
-    "year": 2024,
-    "type": "Heat wave"
+  "PNG": {
+    "year": 1951,
+    "name": "1951 eruption of Mount Lamington",
+    "type": "Volcanic eruption"
   },
   "POL": {
     "year": 2024,
+    "name": "2024 European heat waves",
     "type": "Heat wave"
+  },
+  "PRI": {
+    "year": 1985,
+    "name": "1985 Puerto Rico floods",
+    "type": "Flood"
+  },
+  "PRT": {
+    "year": 2003,
+    "name": "2003 European heat wave",
+    "type": "Heat wave"
+  },
+  "PRY": {
+    "year": 1983,
+    "name": "1982–83 Paraguay floods",
+    "type": "Flood"
+  },
+  "PSE": {
+    "year": 2025,
+    "name": "Storm Byron",
+    "type": "Winter storm"
+  },
+  "PYF": {
+    "year": 1998,
+    "name": "Cyclone Alan",
+    "type": "Landslide"
   },
   "ROU": {
     "year": 2024,
+    "name": "2024 European heat waves",
     "type": "Heat wave"
   },
-  "SRB": {
-    "year": 2024,
+  "RUS": {
+    "year": 2010,
+    "name": "2010 Russian heat wave",
     "type": "Heat wave"
   },
   "SAU": {
     "year": 2024,
+    "name": "2024 Hajj extreme heat disaster",
     "type": "Heat wave"
   },
-  "ESP": {
+  "SLV": {
+    "year": 1934,
+    "name": "1934 Central America hurricane",
+    "type": "Hurricane"
+  },
+  "SOM": {
+    "year": 1997,
+    "name": "1997 Jubba River floods",
+    "type": "Flood"
+  },
+  "SRB": {
+    "year": 2024,
+    "name": "2024 European heat waves",
+    "type": "Heat wave"
+  },
+  "STP": {
+    "year": 2021,
+    "name": "2021 São Tomé floods",
+    "type": "Flood"
+  },
+  "SVK": {
+    "year": 2024,
+    "name": "2024 European heat waves",
+    "type": "Heat wave"
+  },
+  "SVN": {
     "year": 2003,
     "name": "2003 European heat wave",
     "type": "Heat wave"
+  },
+  "SWE": {
+    "year": 2025,
+    "name": "2025 European heat waves",
+    "type": "Heat wave"
+  },
+  "SWZ": {
+    "year": 1984,
+    "name": "Tropical Storm Domoina",
+    "type": "Tropical storm"
+  },
+  "SXM": {
+    "year": 1995,
+    "name": "Hurricane Luis",
+    "type": "Hurricane"
+  },
+  "SYC": {
+    "year": 1997,
+    "name": "1997 Seychelles floods",
+    "type": "Flood"
+  },
+  "TGO": {
+    "year": 2007,
+    "name": "2007 African floods",
+    "type": "Flood"
+  },
+  "TKM": {
+    "name": "1948 Ashgabat earthquake",
+    "type": "Earthquake",
+    "year": 1948,
+    "deaths": 110000,
+    "source": "USGS significant earthquakes"
+  },
+  "TON": {
+    "year": 2009,
+    "name": "2009 Samoa earthquake and tsunami",
+    "type": "Earthquake and tsunami"
+  },
+  "TTO": {
+    "year": 1963,
+    "name": "Hurricane Flora",
+    "type": "Hurricane"
+  },
+  "TUN": {
+    "year": 1969,
+    "name": "1969 Tunisia floods",
+    "type": "Flood"
+  },
+  "TUV": {
+    "year": 1972,
+    "name": "Cyclone Bebe",
+    "type": "Tropical cyclone"
+  },
+  "UKR": {
+    "year": 2006,
+    "name": "January 2006 cold wave",
+    "type": "Cold wave"
+  },
+  "URY": {
+    "year": 2005,
+    "name": "2005 storm in Uruguay",
+    "type": "Extratropical cyclone"
+  },
+  "VCT": {
+    "year": 1902,
+    "name": "1902 eruption of La Soufrière",
+    "type": "Volcanic eruption"
+  },
+  "VEN": {
+    "year": 1999,
+    "name": "Vargas tragedy",
+    "type": "Flood"
+  },
+  "VIR": {
+    "year": 1932,
+    "name": "1932 San Ciprián hurricane",
+    "type": "Hurricane"
+  },
+  "VNM": {
+    "year": 1964,
+    "name": "November 1964 Vietnam floods",
+    "type": "Typhoon"
+  },
+  "VUT": {
+    "year": 1951,
+    "name": "1951 New Hebrides cyclone",
+    "type": "Tropical cyclone"
+  },
+  "WLF": {
+    "year": 1993,
+    "name": "1993 Futuna earthquake",
+    "type": "Earthquake"
+  },
+  "WSM": {
+    "year": 1964,
+    "name": "June 1964 Samoa cyclone",
+    "type": "Tropical cyclone"
+  },
+  "YEM": {
+    "year": 1996,
+    "name": "1996 Oman cyclone",
+    "type": "Flood"
+  },
+  "ZMB": {
+    "year": 2009,
+    "name": "2009 Angola, Namibia and Zambia floods",
+    "type": "Flood"
   }
 }
