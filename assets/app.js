@@ -80,9 +80,10 @@
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
-  /* Layout: the globe sits beside the open card on a wide screen and above it on a narrow one. */
+  /* Layout: on a wide screen the open card is a column at the right of the stage, and the
+     canvas fills the rest. On a narrow screen the card is a sheet over the lower half. */
   function measure() {
-    const rect = stage.getBoundingClientRect();
+    const rect = canvas.getBoundingClientRect();
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
     size = { width: rect.width, height: rect.height, ratio, radius: Math.max(60, Math.min(rect.width, rect.height) / 2 - 14) };
     canvas.width = Math.round(rect.width * ratio);
@@ -93,17 +94,25 @@
   }
 
   function centre() {
-    let cx = size.width / 2;
+    const cx = size.width / 2;
     let cy = size.height / 2;
-    if (card.open && !narrow.matches) {
-      const free = size.width - card.offsetWidth - 16;
-      cx = Math.min(cx, Math.max(free / 2, size.radius * 0.9));
-    } else if (card.open) {
+    if (card.open && narrow.matches) {
       const stageTop = stage.getBoundingClientRect().top;
       const visible = Math.min(size.height, card.getBoundingClientRect().top - stageTop);
       if (visible > 80) cy = Math.min(cy, visible / 2);
     }
     return { cx, cy };
+  }
+
+  // Open or close the card. On a wide screen this changes the width of the canvas, so the
+  // globe keeps its place and scale on the page until the next animation moves it.
+  function toggleCard(open) {
+    const before = { cx: view.cx, cy: view.cy, scale: size.radius * view.zoom };
+    if (open) card.show();
+    else card.close();
+    stage.classList.toggle("has-card", open);
+    measure();
+    Object.assign(view, { cx: before.cx, cy: before.cy, zoom: before.scale / size.radius });
   }
 
   function applyView() {
@@ -511,7 +520,7 @@
     selected = id;
     activeCity = -1;
     fillCard(id, region);
-    if (!wasOpen) card.show();
+    if (!wasOpen) toggleCard(true);
     // On a narrow screen the card covers the lower half of the viewport. Put the
     // globe at the top, so the selected country shows above the card.
     if (narrow.matches) window.scrollTo({ top: window.scrollY + stage.getBoundingClientRect().top, behavior: "instant" });
@@ -534,7 +543,7 @@
 
   function closeCard() {
     if (!card.open) return;
-    card.close();
+    toggleCard(false);
     selected = null;
     activeCity = -1;
     cityLabel.hidden = true;
@@ -542,7 +551,7 @@
     window.JehlpUI?.enhance(select);
     history.replaceState(null, "", location.pathname + location.search);
     status.textContent = "";
-    animateTo(centre(), 450);
+    animateTo({ ...centre(), zoom: clampZoom(view.zoom) }, 450);
     (returnFocus ?? canvas).focus({ preventScroll: true });
   }
 
@@ -701,16 +710,12 @@
     });
 
     const sources = document.getElementById("card-sources");
-    sources.replaceChildren();
     sources.hidden = Boolean(region.unassigned);
     if (!region.unassigned) {
       const gdpSource = region.gdp ? `GDP: ${region.gdp.source}. ` : "";
       const disasterSource = region.disaster ? `Disaster: ${region.disaster.source === "EM-DAT" ? "EM-DAT" : region.disaster.source}. ` : "";
       const religionSource = region.religion ? `Religion: ${region.religion.source}. ` : "";
-      sources.append(document.createTextNode(`${gdpSource}${religionSource}${disasterSource}Cities and capital: GeoNames and Wikidata. Other values: The World Factbook and Wikidata. `));
-      const link = element("a", "", "Sources and method");
-      link.href = "#sources";
-      sources.append(link);
+      sources.textContent = `${gdpSource}${religionSource}${disasterSource}Cities and capital: GeoNames and Wikidata. Other values: The World Factbook and Wikidata.`;
     }
     card.querySelector(".card-body").scrollTop = 0;
   }
@@ -855,8 +860,8 @@
     });
   }
 
-  // Labels stay clear of the card when it is open beside the globe.
-  const labelLimit = () => (card.open && !narrow.matches ? card.offsetLeft : size.width) - 4;
+  // Labels stay inside the canvas, which ends where the card begins.
+  const labelLimit = () => size.width - 4;
 
   // A pin under the pointer marks its row in the card.
   function pointAt(mark) {
@@ -999,7 +1004,7 @@
       };
       const count = Object.keys(regions).length;
       status.textContent = `${count} countries and territories.`;
-      document.getElementById("sources-date").textContent = `Data collected on ${data.collected}.`;
+      document.getElementById("data-date").textContent = `Data collected on ${data.collected}.`;
       render();
       const id = location.hash.slice(1);
       if (regions[id]) selectRegion(id, { from: "hash" });

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A globe of the world’s countries. Select a country to see its most populous cities, highest and lowest points, largest lake, main exports, GDP and official languages.">
+    <meta name="description" content="A globe of the world’s countries. Select a country to see its capital and largest cities, population, GDP, languages, religion, highest and lowest points, largest lake, longest river, deadliest disaster and main exports.">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Gazetteer">
     <meta property="og:description" content="A globe of the world’s countries, with reference data for each one.">
@@ -18,11 +18,11 @@
     <link rel="stylesheet" href="https://jehlp.net/site-theme/v2/base.css?v=20261009-reading-folio">
     <link rel="stylesheet" href="https://jehlp.net/site-theme/v2/components.css">
     <script src="https://jehlp.net/site-theme/v2/components.js" defer></script>
-    <link rel="stylesheet" href="assets/styles.css?v=20261030c">
+    <link rel="stylesheet" href="assets/styles.css?v=20261030d">
     <script src="assets/vendor/d3-array.min.js" defer></script>
     <script src="assets/vendor/d3-geo.min.js" defer></script>
     <script src="assets/vendor/topojson-client.min.js" defer></script>
-    <script src="assets/app.js?v=20261030c" defer></script>
+    <script src="assets/app.js?v=20261030d" defer></script>
   </head>
   <body data-site-tone="teal">
     <a class="skip-link" href="#country-select">Skip to the country list</a>
@@ -30,7 +30,6 @@
     <header class="site-header site-header--identity">
       <div class="site-brand"><img class="site-mark" src="assets/mark.png" width="32" height="32" alt=""><h1 class="site-title">Gazetteer</h1></div>
       <nav aria-label="Page links">
-        <a href="#sources">Sources</a>
         <span class="site-utility-pair">
           <a class="site-home" href="https://jehlp.net/" aria-label="Home — jehlp.net" title="Home — jehlp.net"><span aria-hidden="true">✳</span></a>
           <button class="theme-toggle" type="button" data-theme-toggle aria-label="Use dark theme"></button>
@@ -331,64 +330,8 @@
       <noscript><p class="noscript">The globe needs JavaScript.</p></noscript>
     </main>
 
-    <section id="sources" class="sources" aria-labelledby="sources-title">
-      <div class="site-divider" data-ornament="constellation" aria-hidden="true"><span></span></div>
-      <h2 id="sources-title">Sources and method</h2>
-      <dl class="source-list">
-        <div>
-          <dt>Boundaries</dt>
-          <dd>The boundaries come from the <a href="https://www.naturalearthdata.com/downloads/50m-cultural-vectors/50m-admin-0-countries-2/">Natural Earth</a> admin-0 countries at 1:50m. Gibraltar comes from the 1:10m set. Natural Earth shows the boundaries that are in effect. Dashed lines show disputed boundaries. A boundary on this map does not show recognition.</dd>
-        </div>
-        <div>
-          <dt>Cities</dt>
-          <dd><a href="https://www.geonames.org/">GeoNames</a> gives the candidate settlements. <a href="https://www.wikidata.org/">Wikidata</a> gives the most recent official population of each candidate, with its year. A figure without a year comes from GeoNames. A city is the municipality or city proper. Definitions differ between countries, so compare cities within one country. A review removes the districts of a larger city.</dd>
-        </div>
-        <div>
-          <dt>Elevation and exports</dt>
-          <dd>The values come from the final edition of <a href="https://github.com/factbook/factbook.json">The World Factbook</a>, January 2026. The Factbook gives the five largest export commodities by value. The list does not include services.</dd>
-        </div>
-        <div>
-          <dt>Lakes</dt>
-          <dd>The values come from The World Factbook and Wikidata. The largest lake is the largest body of standing water by area. Reservoirs and salt lakes are included. Lagoons of the sea, salt flats and former lakes are not. For a shared lake, the area is the area of the whole lake.</dd>
-        </div>
-        <div>
-          <dt>Rivers</dt>
-          <dd>The longest river is the longest river that flows through the country or along its border. Wikidata gives the rivers of each country and their lengths. The length is the length of the whole river. The <a href="https://www.naturalearthdata.com/downloads/10m-physical-vectors/10m-rivers-lake-centerlines/">Natural Earth</a> river lines at 1:10m show the course. Where Natural Earth has no line for a river, the map does not show it.</dd>
-        </div>
-        <div>
-          <dt>Population</dt>
-          <dd>The <a href="https://data.worldbank.org/indicator/SP.POP.TOTL">World Bank</a> gives the population for the most recent year. The World Factbook gives it for Taiwan and for most territories.</dd>
-        </div>
-        <div>
-          <dt>GDP</dt>
-          <dd>GDP is nominal, in current US dollars. The <a href="https://data.worldbank.org/indicator/NY.GDP.MKTP.CD">World Bank</a> gives the most recent year. The <a href="https://www.imf.org/external/datamapper/NGDPD@WEO">IMF World Economic Outlook</a> gives the figure for Taiwan and for countries where the World Bank figure is before 2023. The World Factbook gives the figure for most territories.</dd>
-        </div>
-        <div>
-          <dt>Disasters</dt>
-          <dd><a href="https://www.emdat.be/">EM-DAT</a> records the deaths from natural disasters by country, year and type. <a href="https://ourworldindata.org/natural-disasters">Our World in Data</a> publishes these records. A figure can include more than one event of the same type in that year. Wikidata gives the name of the event when its country, year and type agree. The list does not include droughts, because most of their deaths are from famine. EM-DAT records events before 1992 under the USSR and Yugoslavia. For their successor states, a Wikidata event can replace the EM-DAT figure. A review names the other events from Wikipedia and from <a href="https://glidenumber.net/">GLIDE</a> disaster records. A name without a Wikipedia article gives the year, the place and the type.</dd>
-        </div>
-        <div>
-          <dt>Capitals</dt>
-          <dd>GeoNames gives the capital of each country and territory. A review adds a note where the government sits in a different city, or where the capital is disputed. Hong Kong, Macao and Western Sahara show no capital.</dd>
-        </div>
-        <div>
-          <dt>Religion</dt>
-          <dd><a href="https://www.pewresearch.org/religion/feature/religious-composition-by-country-2010-2020/">Pew Research Center</a> gives the share of seven religious groups in 2020. “No religion” is the group of people who do not identify with a religion. The World Factbook gives the shares for territories with fewer than 100,000 people.</dd>
-        </div>
-        <div>
-          <dt>Map symbols</dt>
-          <dd>Pins show the most populous cities in order. A star-shaped pin shows the capital. A small star shows a capital that is not one of the ten cities. Triangles show the highest and lowest points, from Wikidata positions. A lowest point at sea level on the coast has no triangle. Natural Earth gives the lake outlines. A dot shows a lake without an outline. A blue line shows the longest river.</dd>
-        </div>
-        <div>
-          <dt>Official languages</dt>
-          <dd>The list gives the languages that are official at the national level. It comes from a review of The World Factbook and Wikidata. Where no law sets a language, the list gives the language in general use and says so.</dd>
-        </div>
-      </dl>
-      <p class="sources-date" id="sources-date"></p>
-    </section>
-
     <footer class="site-footer">
-      <p>The data comes from Natural Earth, GeoNames, Wikidata, The World Factbook, the World Bank, the IMF, EM-DAT and Pew Research Center.</p>
+      <p>The data comes from Natural Earth, GeoNames, Wikidata, The World Factbook, the World Bank, the IMF, EM-DAT and Pew Research Center. <span id="data-date"></span></p>
       <p>jehlp.net · <a href="https://github.com/JWKNT/gazetteer">Source</a></p>
     </footer>
   </body>

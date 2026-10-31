@@ -1,6 +1,7 @@
 /* Gazetteer: a globe with a country card. Shared tokens come from site-theme v2. */
 :root {
-  --card-width: 25rem;
+  /* The open card is the right margin of the stage on a wide screen. */
+  --card-column: clamp(17rem, 32%, 24rem);
   /* Globe colors. The script reads these, so the globe follows the color mode. */
   --globe-water: #e2e9ef;
   --globe-land: #fbfaf7;
@@ -18,7 +19,7 @@
   --globe-limb: rgb(0 0 0 / 45%);
 }
 
-.atlas, .sources, .site-footer {
+.atlas, .site-footer {
   width: var(--site-frame-width, min(74rem, calc(100% - 5rem)));
   margin-inline: auto;
 }
@@ -58,15 +59,21 @@
   text-align: right;
 }
 
-/* The stage keeps the globe in the first viewport on wide and narrow screens. */
+/* The stage keeps the globe in the first viewport on wide and narrow screens. On a wide
+   screen the open card takes a column at the right, and the globe fills the rest. */
 .globe-stage {
   position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   height: clamp(20rem, calc(100vh - 12rem), 50rem);
   height: clamp(20rem, calc(100svh - 12rem), 50rem);
   margin-top: .75rem;
 }
+.globe-stage.has-card { grid-template-columns: minmax(0, 1fr) var(--card-column); }
 
 #globe {
+  grid-area: 1 / 1;
   display: block;
   width: 100%;
   height: 100%;
@@ -98,22 +105,26 @@
   font: var(--text-ui, .875rem)/1.6 var(--ui, var(--serif));
 }
 
-/* The country card: a non-modal dialog beside the globe. */
+/* The country card: a non-modal dialog in the right margin of the stage, with one rule
+   between it and the globe. */
 .country-card {
-  position: absolute;
-  inset: .5rem 0 auto auto;
-  z-index: 4;
+  position: static;
+  grid-area: 1 / 2;
   display: none;
   flex-direction: column;
-  width: min(var(--card-width), 100%);
-  max-height: calc(100% - 1rem);
+  width: auto;
+  height: auto;
+  min-height: 0;
+  max-height: none;
   margin: 0;
   padding: 0;
   overflow: hidden;
-  border: 1px solid var(--line-strong);
+  border: 0;
+  border-left: 1px solid var(--line);
   border-radius: 0;
   background: var(--paper);
   color: var(--ink);
+  container-type: inline-size;
 }
 .country-card[open] { display: flex; }
 
@@ -163,7 +174,6 @@
 .card-note { margin: .35rem 0 .1rem; }
 .card-empty { margin: .2rem 0 0; font-size: var(--text-ui, .875rem); }
 .card-sources { margin: 1rem 0 0; padding-top: .6rem; border-top: 1px solid var(--line); }
-.card-sources a { color: inherit; }
 
 .card-facts {
   display: grid;
@@ -193,6 +203,12 @@
    below a long text instead of squeezing it. */
 .fact-figure { margin-left: auto; font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
 .card-facts > :nth-last-child(-n + 2) { border-bottom: 0; }
+/* In a narrow card each label goes above its value. */
+@container (max-width: 20rem) {
+  .card-facts { grid-template-columns: minmax(0, 1fr); }
+  .card-facts dt { padding-bottom: 0; border-bottom: 0; }
+  .card-facts dd { padding-top: .15rem; }
+}
 .fact-symbol { width: .7rem; height: .7rem; margin-right: .4rem; vertical-align: -.02rem; fill: var(--ink); }
 .fact-symbol--lake { fill: var(--blue); }
 .fact-symbol--river { fill: none; stroke: var(--blue); stroke-width: 1.6; stroke-linecap: round; }
@@ -232,34 +248,25 @@
 .city-table tbody tr.is-active { background: var(--surface-blue); }
 .city-table tbody tr:last-child td { border-bottom: 0; }
 
-/* Sources: a reading measure, one rule per entry. */
-.sources { padding: 0 0 1rem; }
-.sources > .site-divider { margin-block: clamp(2rem, 5vw, 3.25rem) 1.5rem; }
-.sources h2 { margin: 0 0 .75rem; font-weight: 700; }
-.source-list { max-width: 72ch; margin: 0; }
-.source-list > div { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: .25rem 1.25rem; padding: .7rem 0; border-top: 1px solid var(--line); }
-.source-list dt { font-weight: 700; }
-.source-list dd { margin: 0; color: var(--muted-strong); line-height: 1.6; }
-.sources-date { color: var(--muted); font: var(--text-meta, .75rem)/1.5 var(--ui, var(--serif)); }
-
 .site-footer a { color: inherit; }
 .noscript { color: var(--muted); }
 
 /* On a narrow screen the card is a sheet at the bottom of the viewport. */
 @media (max-width: 42rem) {
   .globe-status { flex-basis: 100%; text-align: left; }
-  .globe-stage { height: min(calc(100vw - 1rem), 68vh); height: min(calc(100vw - 1rem), 68svh); }
+  .globe-stage, .globe-stage.has-card { display: block; height: min(calc(100vw - 1rem), 68vh); height: min(calc(100vw - 1rem), 68svh); }
   .country-card {
     position: fixed;
     inset: auto 0 0 0;
+    z-index: 4;
     width: 100%;
     max-height: 50vh;
     max-height: 50svh;
-    border-width: 1px 0 0;
+    border: 0;
+    border-top: 1px solid var(--line-strong);
   }
   .card-head { padding-left: 1rem; }
   .card-body { padding-inline: 1rem; padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
-  .source-list > div { grid-template-columns: 1fr; }
 }
 
 @media (pointer: coarse) {
@@ -268,7 +275,7 @@
 
 @media print {
   .atlas-tools, .globe-help, .card-close { display: none !important; }
-  .globe-stage { height: auto; }
+  .globe-stage { display: block; height: auto; }
   #globe { display: none; }
   .country-card[open] { position: static; width: 100%; max-height: none; border: 0; }
   .card-body { overflow: visible; }
