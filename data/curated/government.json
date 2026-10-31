@@ -1,0 +1,183 @@
+{
+  "_about": "Reviewed changes to the Factbook government type, independence and former names. 'type' and 'note' replace the government type. Under 'independence', 'pick' chooses one of the Factbook dates, and 'label', 'date' and 'description' replace parts of the record. 'former' replaces the list of former names. 'reason' explains each change.",
+  "type": {
+    "AFG": {
+      "type": "Theocratic emirate",
+      "note": "The Taliban took power in August 2021. Most countries do not recognize the government.",
+      "reason": "The Factbook note gives only the position of the United States."
+    },
+    "AND": {
+      "type": "Parliamentary co-principality",
+      "note": "The President of France and the Bishop of Urgell are the heads of state.",
+      "reason": "The Factbook text is a long sentence."
+    },
+    "ATA": {
+      "type": "Antarctic Treaty System",
+      "note": "The treaty limits the continent to peaceful and scientific use and sets aside territorial claims.",
+      "reason": "The Factbook text is a long sentence."
+    },
+    "BFA": {
+      "type": "Military government",
+      "note": "The army has ruled since the two coups of 2022.",
+      "reason": "The Factbook gives the form in the constitution."
+    },
+    "CYP": {
+      "type": "Presidential republic",
+      "note": "Northern Cyprus, which only Turkey recognizes, is a parliamentary republic.",
+      "reason": "The Factbook gives two types in one sentence."
+    },
+    "ESH": {
+      "type": "Disputed territory",
+      "note": "Morocco controls most of the territory. The Polisario Front claims it as the Sahrawi Arab Democratic Republic.",
+      "reason": "The Factbook text is a long sentence."
+    },
+    "GNB": {
+      "type": "Military government",
+      "note": "The army took power in November 2025.",
+      "reason": "The Factbook gives the form in the constitution."
+    },
+    "MDG": {
+      "type": "Military-led transitional government",
+      "note": "The army took power in October 2025.",
+      "reason": "The Factbook gives the form in the constitution."
+    },
+    "MLI": {
+      "type": "Military government",
+      "note": "The army has ruled since the coups of 2020 and 2021.",
+      "reason": "The Factbook gives the form in the constitution."
+    },
+    "MMR": {
+      "type": "Military regime",
+      "note": "The army took power in February 2021.",
+      "reason": "Adds the date."
+    },
+    "NER": {
+      "type": "Military government",
+      "note": "The army has ruled since the coup of July 2023.",
+      "reason": "The Factbook gives 'formerly, semi-presidential republic'."
+    },
+    "PSE": {
+      "type": "Semi-presidential republic",
+      "note": "The Palestinian Authority administers parts of the West Bank.",
+      "reason": "The Factbook has no entry for Palestine."
+    },
+    "SDN": {
+      "type": "Military government",
+      "note": "The army and the Rapid Support Forces have fought a civil war since April 2023.",
+      "reason": "The Factbook gives the form in the constitution."
+    },
+    "VAT": {
+      "type": "Ecclesiastical elective monarchy",
+      "note": "Self-described as an absolute monarchy.",
+      "reason": "Removes the quotation marks."
+    }
+  },
+  "independence": {
+    "AUT": {
+      "pick": "12 November 1918",
+      "reason": "The Factbook gives no official date. The First Republic is the start of the present state."
+    },
+    "COK": {
+      "label": "Self-government",
+      "reason": "The Cook Islands are in free association with New Zealand."
+    },
+    "ESH": {
+      "label": "Independence",
+      "date": "None",
+      "description": "The Polisario Front proclaimed the Sahrawi Arab Democratic Republic on 27 February 1976.",
+      "reason": "The Factbook has no independence field for Western Sahara."
+    },
+    "ETH": {
+      "label": "Founded",
+      "date": "1st century B.C.",
+      "description": "The Aksumite Kingdom. Ethiopia is the oldest independent country in Africa.",
+      "reason": "The Factbook gives a sentence without a date."
+    },
+    "FRA": {
+      "pick": "10 August 843",
+      "reason": "The Factbook gives no official date. Western Francia is the usual starting point of France."
+    },
+    "GBR": {
+      "pick": "1 January 1801",
+      "reason": "The Factbook gives no official date. The Acts of Union created the United Kingdom."
+    },
+    "GNB": {
+      "label": "Independence",
+      "description": "Declared. Portugal recognized it on 10 September 1974.",
+      "reason": "The Factbook gives only the word declared."
+    },
+    "JPN": {
+      "pick": "11 February 660 B.C.",
+      "reason": "The Factbook's first date is the current constitution, not the founding."
+    },
+    "NIU": {
+      "label": "Self-government",
+      "reason": "Niue is in free association with New Zealand."
+    },
+    "PSE": {
+      "label": "Independence",
+      "date": "15 November 1988",
+      "description": "Declared by the Palestine National Council",
+      "reason": "The Factbook has no entry for Palestine."
+    },
+    "ROU": {
+      "label": "Independence",
+      "date": "9 May 1877",
+      "description": "Proclaimed from the Ottoman Empire",
+      "reason": "The Factbook text has a parenthesis that does not close."
+    },
+    "SOM": {
+      "label": "Independence",
+      "description": "British Somaliland and Italian Somaliland united as the Somali Republic.",
+      "reason": "The Factbook gives a long clause."
+    },
+    "SPM": {
+      "description": "Overseas collectivity of France",
+      "reason": "The Factbook text repeats the word collectivity."
+    },
+    "TWN": {
+      "label": "Founded",
+      "date": "1 January 1912",
+      "description": "The Republic of China was established. Its government moved to Taiwan in 1949.",
+      "reason": "The Factbook has no independence field for Taiwan."
+    }
+  },
+  "former": {
+    "FSM": {
+      "names": [
+        "New Philippines",
+        "Caroline Islands",
+        "Trust Territory of the Pacific Islands"
+      ],
+      "reason": "The Factbook list includes district names."
+    },
+    "MAR": {
+      "names": [
+        "French Protectorate in Morocco",
+        "Spanish Protectorate in Morocco"
+      ],
+      "reason": "Ifni, Spanish Sahara and Western Sahara are names of territories, not of Morocco."
+    },
+    "MMR": {
+      "names": [
+        "Burma",
+        "Socialist Republic of the Union of Burma",
+        "Union of Myanmar"
+      ],
+      "reason": "The country took the name Myanmar in 1989. The Factbook still uses Burma, so its list leaves it out."
+    },
+    "WLF": {
+      "names": [
+        "Hoorn Islands"
+      ],
+      "reason": "The Factbook gives a sentence: the Hoorn Islands is the former name of the Futuna Islands."
+    },
+    "YEM": {
+      "names": [
+        "Yemen Arab Republic",
+        "People's Democratic Republic of Yemen"
+      ],
+      "reason": "The two states that united in 1990."
+    }
+  }
+}

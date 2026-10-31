@@ -174,6 +174,38 @@ test('each drawn river has a line, and lengths are plausible', () => {
   assert.ok(read('data/rivers.json').length < 300 * 1024);
 });
 
+test('government, independence and former names have the reviewed values', () => {
+  assert.equal(regions.USA.government.type, 'Constitutional federal republic');
+  assert.equal(regions.GBR.government.note, 'A Commonwealth realm');
+  assert.equal(regions.MLI.government.type, 'Military government');
+  assert.deepEqual([regions.IND.independence.label, regions.IND.independence.date], ['Independence', '15 August 1947']);
+  assert.deepEqual([regions.GBR.independence.label, regions.GBR.independence.date], ['Founded', '1 January 1801']);
+  assert.equal(regions.CHN.independence.earlier.date, '221 B.C.');
+  assert.equal(regions.PRY.independence.date, '14-15 May 1811');
+  assert.equal(regions.BMU.independence.date, 'None');
+  assert.ok(regions.COD.former.includes('Zaire'));
+  assert.equal(regions.MMR.former[0], 'Burma');
+  for (const [id, region] of Object.entries(regions)) {
+    if (region.unassigned) continue;
+    const founding = region.independence;
+    if (founding) assert.ok(['Independence', 'Founded', 'Self-government'].includes(founding.label) && founding.date, `${id} independence`);
+    if (region.government) assert.match(region.government.type, /^[A-Z]/, `${id} government type`);
+    for (const name of region.former ?? []) assert.match(name, /^[A-Z][^()[\];]*$/, `${id} former name ${name}`);
+  }
+});
+
+test('memberships match the size of each organization', () => {
+  const { organizations } = JSON.parse(read('data/countries.json'));
+  const count = key => Object.values(regions).filter(region => region.memberships?.includes(key)).length;
+  const sizes = { UN: 193, UNSC: 5, G7: 7, G20: 19, OECD: 38, BRICS: 10, OPEC: 12, NATO: 32, EU: 27, CoE: 46,
+    ASEAN: 11, AU: 55, LAS: 22, GCC: 6, EAC: 8, SCO: 10, CSTO: 6, Commonwealth: 56, OIC: 57 };
+  for (const [key, size] of Object.entries(sizes)) assert.equal(count(key), size, key);
+  for (const [key, org] of Object.entries(organizations)) assert.ok(org.label && org.name, key);
+  for (const region of Object.values(regions)) for (const key of region.memberships ?? []) assert.ok(organizations[key], key);
+  assert.ok(regions.IDN.memberships.includes('BRICS') && !regions.SAU.memberships.includes('BRICS'));
+  assert.ok(!regions.RUS.memberships.includes('CoE') && !regions.GBR.memberships.includes('EU'));
+});
+
 test('each outlined lake has a shape, and the globe has map lakes', () => {
   const lakes = JSON.parse(read('data/lakes.json'));
   const shapes = lakes.objects.lakes.geometries;

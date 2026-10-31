@@ -11,6 +11,8 @@ import { loadLakeLayers, findLakeShapes, mapLakes, lakeTopology } from './lib/la
 import { readEmdat, deadliestDisaster } from './lib/disasters.mjs';
 import { readPew, readM49, factbookShares, mainReligion, groupNames } from './lib/religion.mjs';
 import { loadRiverLines, splitLines, shapeIndex, linkLines, lengthKm, riverTopology } from './lib/rivers.mjs';
+import { governmentType, formerNames, independence, independenceDates } from './lib/government.mjs';
+import { organizations, members } from './lib/organizations.mjs';
 import { feature } from 'topojson-client';
 import { geoContains, geoCentroid } from 'd3-geo';
 
@@ -23,6 +25,8 @@ const lakeFixes = curated('lakes');
 const capitalFixes = curated('capitals');
 const religionFixes = curated('religion');
 const riverFixes = curated('rivers');
+const governmentFixes = curated('government');
+const organizationFixes = curated('organizations');
 
 const regions = loadRegions();
 
@@ -200,6 +204,39 @@ function riverOf(region) {
   };
 }
 
+/* Government type, independence and former names: The World Factbook, with reviewed
+   changes. A reviewed pick chooses one of the Factbook dates, and the earliest Factbook
+   date before it goes on a second line. */
+function governmentOf(region, entries) {
+  const fix = governmentFixes.type[region.id];
+  return fix ? { type: fix.type, ...(fix.note ? { note: fix.note } : {}) } : governmentType(entries);
+}
+const yearOf = date => (/B\.C\./.test(date) ? -1 : 1) * Number(date.match(/(\d{1,4})(?: B\.C\.)?$/)?.[1] ?? NaN);
+function independenceOf(region, entries) {
+  const fix = governmentFixes.independence[region.id];
+  let record = independence(entries);
+  if (fix?.pick) {
+    const dates = independenceDates(entries);
+    const picked = dates.find(item => item.date === fix.pick);
+    if (!picked) throw new Error(`${region.id}: no Factbook date ${fix.pick}`);
+    const first = dates.filter(item => yearOf(item.date) < yearOf(picked.date)).sort((a, b) => yearOf(a.date) - yearOf(b.date))[0];
+    record = { label: 'Founded', ...picked, ...(first ? { earlier: first } : {}) };
+  }
+  if (fix && !fix.pick) {
+    record = { ...record, ...(fix.label ? { label: fix.label } : {}), ...(fix.date ? { date: fix.date } : {}), ...(fix.description ? { description: fix.description } : {}) };
+    if (fix.date) delete record.earlier;
+  }
+  return record;
+}
+function formerOf(region, entries) {
+  return governmentFixes.former[region.id]?.names ?? formerNames(entries);
+}
+
+/* Memberships of major international organizations. */
+const membership = members(regions, region => region.factbook.map(factbook.entry).filter(Boolean),
+  readJson(requireFile(paths.wikidataMemberships)), organizationFixes);
+const membershipsOf = region => organizations.filter(org => membership.get(org.key).has(region.id)).map(org => org.key);
+
 /* Exports: the Factbook list of the five largest commodities by value. */
 function exportsOf(entries) {
   const found = entries.map(factbook.exports).find(Boolean);
@@ -265,6 +302,10 @@ for (const region of regions) {
   record.gdp = gdp(region, entries);
   const capital = capitalOf(region, ranked);
   if (capital) record.capital = capital;
+  record.government = governmentOf(region, entries);
+  record.independence = independenceOf(region, entries);
+  const former = formerOf(region, entries);
+  if (former.length) record.former = former;
   record.languages = languagesOf(region);
   record.religion = religionOf(region, entries);
   Object.assign(record, elevation(region, entries));
@@ -292,6 +333,7 @@ for (const region of regions) {
     if (fix.name) record.disaster.name = fix.name;
     if (fix.type) record.disaster.type = fix.type;
   }
+  record.memberships = membershipsOf(region);
   record.exports = exportsOf(entries);
   record.cities = ranked.map(city =>
     [city.name, city.population, city.year, Math.round(city.lat * 1000) / 1000, Math.round(city.lon * 1000) / 1000]);
@@ -303,7 +345,9 @@ writeFileSync(`${root}data/rivers.json`, JSON.stringify(riverTopology([...drawnR
 
 // One region per line keeps the file small and its history readable.
 const lines = Object.entries(output).map(([id, record]) => `${JSON.stringify(id)}:${JSON.stringify(record)}`);
-writeFileSync(`${root}data/countries.json`, `{"collected":${JSON.stringify(collected)},"regions":{\n${lines.join(',\n')}\n}}\n`);
+// The short and full name of each organization, in display order.
+const organizationNames = Object.fromEntries(organizations.map(org => [org.key, { label: org.label, name: org.name }]));
+writeFileSync(`${root}data/countries.json`, `{"collected":${JSON.stringify(collected)},"organizations":${JSON.stringify(organizationNames)},"regions":{\n${lines.join(',\n')}\n}}\n`);
 
 // The country list in the page is static HTML, so it works before the script runs.
 const escape = text => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');

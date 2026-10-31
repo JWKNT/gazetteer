@@ -1,0 +1,28 @@
+{
+  "_about": "Reviewed corrections to the members of the organizations in tools/lib/organizations.mjs, checked against the organizations' member lists in October 2026. Keys are region IDs. Each value gives the reason. Suspended members stay members.",
+  "add": {
+    "UNSC": {
+      "CHN": "Permanent member under the UN Charter.",
+      "FRA": "Permanent member under the UN Charter.",
+      "GBR": "Permanent member under the UN Charter.",
+      "RUS": "Permanent member under the UN Charter.",
+      "USA": "Permanent member under the UN Charter."
+    },
+    "UN observer": { "PSE": "Non-member observer state since 29 November 2012. The Factbook has no entry for Palestine." },
+    "WTO": { "COM": "Joined on 21 August 2024. The Factbook still lists it as an observer." },
+    "SCO": { "IRN": "Joined on 4 July 2023.", "BLR": "Joined on 4 July 2024." },
+    "LAS": { "PSE": "Member since 1976. The Factbook has no entry for Palestine." },
+    "SADC": { "COM": "Joined in 2017." },
+    "OIC": { "PSE": "Member since 1969. The Factbook has no entry for Palestine." }
+  },
+  "remove": {
+    "OECD": { "IND": "A key partner of the OECD, not a member." },
+    "BRICS": { "SAU": "Invited in 2023. Saudi Arabia has not confirmed its membership." },
+    "OPEC": { "AGO": "Left on 1 January 2024." },
+    "WTO": { "DZA": "An observer, not a member." },
+    "CIS": { "TKM": "An associate member since 2005." },
+    "ASEAN": { "AUS": "A dialogue partner, not a member." },
+    "OAS": { "NIC": "Its withdrawal took effect on 19 November 2023." },
+    "Mercosur": { "MEX": "An observer, not a member." }
+  }
+}

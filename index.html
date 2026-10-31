@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A globe of the world’s countries. Select a country to see its capital and largest cities, population, GDP, languages, religion, highest and lowest points, largest lake, longest river, deadliest disaster and main exports.">
+    <meta name="description" content="A globe of the world’s countries. Select a country to see its capital and largest cities, government, independence, population, GDP, languages, religion, geography, deadliest disaster, memberships and main exports.">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Gazetteer">
     <meta property="og:description" content="A globe of the world’s countries, with reference data for each one.">
@@ -18,11 +18,11 @@
     <link rel="stylesheet" href="https://jehlp.net/site-theme/v2/base.css?v=20261009-reading-folio">
     <link rel="stylesheet" href="https://jehlp.net/site-theme/v2/components.css">
     <script src="https://jehlp.net/site-theme/v2/components.js" defer></script>
-    <link rel="stylesheet" href="assets/styles.css?v=20261030d">
+    <link rel="stylesheet" href="assets/styles.css?v=20261031a">
     <script src="assets/vendor/d3-array.min.js" defer></script>
     <script src="assets/vendor/d3-geo.min.js" defer></script>
     <script src="assets/vendor/topojson-client.min.js" defer></script>
-    <script src="assets/app.js?v=20261030d" defer></script>
+    <script src="assets/app.js?v=20261031a" defer></script>
   </head>
   <body data-site-tone="teal">
     <a class="skip-link" href="#country-select">Skip to the country list</a>
@@ -308,6 +308,11 @@
           <div class="card-body">
             <p class="card-note" id="card-note" hidden></p>
             <dl class="card-facts" id="card-facts"></dl>
+            <section class="card-section" aria-labelledby="memberships-title">
+              <h3 id="memberships-title">Memberships</h3>
+              <ul class="org-list" id="membership-list"></ul>
+              <p class="card-empty" id="memberships-empty" hidden>No membership in a major international organization.</p>
+            </section>
             <section class="card-section" aria-labelledby="exports-title">
               <h3 id="exports-title">Main exports <span class="card-year" id="exports-year"></span></h3>
               <ol class="export-list" id="export-list"></ol>

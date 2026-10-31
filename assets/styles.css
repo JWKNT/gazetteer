@@ -229,6 +229,18 @@
   font: 700 1rem/1.3 var(--display);
 }
 
+/* An open list on one or more lines, with a dot between the names. */
+.org-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: var(--text-ui, .875rem)/1.6 var(--serif);
+}
+.org-list li:not(:last-child)::after { content: "·"; margin: 0 .45rem; color: var(--muted); }
+.org-list abbr { text-decoration: none; cursor: help; }
+
 .export-list {
   margin: 0;
   padding-left: 1.6rem;

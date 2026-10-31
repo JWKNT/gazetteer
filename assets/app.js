@@ -28,6 +28,7 @@
 
   let size = { width: 0, height: 0, ratio: 1, radius: 0 };
   let regions = {};
+  let organizations = {};
   let shapes = new Map();
   let pickOrder = [];
   let land = null;
@@ -638,6 +639,16 @@
         ? { figure: people(region.population.count), year: region.population.year } : noData);
       fact(facts, "GDP", region.gdp ? { figure: money(region.gdp.usd), year: region.gdp.year } : noData);
       if (region.capital) fact(facts, "Capital", { text: region.capital.name, note: region.capital.note, mark: "capital" });
+      if (region.government) fact(facts, "Government", { text: region.government.type, note: region.government.note });
+      const founding = region.independence;
+      if (founding) {
+        const earlier = founding.earlier && `Earlier: ${founding.earlier.date}${founding.earlier.description ? ` — ${founding.earlier.description}` : ""}`;
+        fact(facts, founding.label, {
+          text: founding.date,
+          note: [founding.description, earlier].filter(Boolean).map(part => part.replace(/\.$/, "")).join(". "),
+        });
+      }
+      if (region.former) fact(facts, region.former.length === 1 ? "Former name" : "Former names", { text: region.former.join(", ") });
       const languages = region.languages ?? { list: [] };
       fact(facts, languages.list.length === 1 ? "Official language" : "Official languages",
         { text: languages.list.length ? languages.list.join(", ") : "None", note: languages.note });
@@ -674,6 +685,26 @@
         note: disaster.name ? `${disaster.type}, ${disaster.year}` : "",
       } : noneRecorded);
     }
+
+    // Acronyms carry their full name. Names such as "African Union" stand alone.
+    const membershipList = document.getElementById("membership-list");
+    membershipList.replaceChildren();
+    const memberships = region.memberships ?? [];
+    for (const key of memberships) {
+      const org = organizations[key];
+      const item = element("li");
+      if (/^[A-Z0-9]+$|^Mercosur$/.test(org.label) && org.label !== org.name) {
+        const abbr = element("abbr", "", org.label);
+        abbr.title = org.name;
+        item.append(abbr);
+      } else {
+        item.textContent = org.label;
+      }
+      membershipList.append(item);
+    }
+    membershipList.hidden = !memberships.length;
+    document.getElementById("memberships-empty").hidden = Boolean(memberships.length);
+    membershipList.closest("section").hidden = Boolean(region.unassigned);
 
     const exportsList = document.getElementById("export-list");
     const exportsYear = document.getElementById("exports-year");
@@ -969,6 +1000,7 @@
         return response.json();
       }));
       regions = data.regions;
+      organizations = data.organizations;
       const features = topojson.feature(topology, topology.objects.countries).features;
       shapes = new Map();
       pickOrder = [];

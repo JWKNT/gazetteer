@@ -1,6 +1,6 @@
 // Download the source snapshot into .cache/. Run: npm run fetch [-- step ...]
 // Steps: geography, geonames, factbook, gdp, population, cities, lakes, lakepoints,
-// extremes, disasters, religion. Without a step, run all. Later steps read earlier results.
+// extremes, disasters, rivers, memberships, religion. Without a step, run all. Later steps read earlier results.
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname } from 'node:path';
@@ -8,6 +8,7 @@ import { paths, readGeonames, cityCandidates, readJson, requireFile, root } from
 import { sparql, qid, api, areaKm2 } from './lib/wikidata.mjs';
 import { loadRegions } from './lib/regions.mjs';
 import * as factbook from './lib/factbook.mjs';
+import { organizations } from './lib/organizations.mjs';
 
 const naturalEarth = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/';
 
@@ -379,6 +380,31 @@ const steps = {
     }
     writeFileSync(paths.wikidataRivers, JSON.stringify(rivers));
     console.log(`Rivers: ${ids.length} rivers with a length`);
+  },
+
+  // Membership statements of the regions in the organizations on the card, with their
+  // start and end dates and any role, such as observer.
+  async memberships() {
+    const regionByItem = new Map(loadRegions().map(region => [region.wikidata, region.id]));
+    const byItem = new Map(organizations.filter(org => org.wikidata).map(org => [org.wikidata, org.key]));
+    const rows = await sparql(`SELECT ?org ?country ?start ?end ?roleLabel ?rank WHERE {
+      VALUES ?org { ${[...byItem.keys()].map(id => `wd:${id}`).join(' ')} }
+      ?country p:P463 ?statement . ?statement ps:P463 ?org ; wikibase:rank ?rank .
+      OPTIONAL { ?statement pq:P580 ?start } OPTIONAL { ?statement pq:P582 ?end }
+      OPTIONAL { ?statement pq:P2868 ?role }
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+    }`);
+    const result = {};
+    for (const row of rows) {
+      const id = regionByItem.get(qid(row.country.value));
+      if (!id) continue;
+      (result[byItem.get(qid(row.org.value))] ??= []).push({
+        id, start: row.start?.value.slice(0, 10) ?? null, end: row.end?.value.slice(0, 10) ?? null,
+        role: row.roleLabel?.value ?? null, rank: row.rank.value.split('#')[1],
+      });
+    }
+    writeFileSync(paths.wikidataMemberships, JSON.stringify(result));
+    console.log(`Memberships: ${rows.length} statements`);
   },
 
   // Pew Research Center: religious composition of 201 countries and territories, 2010 and 2020.

@@ -27,6 +27,7 @@ export const paths = {
   wikidataCities: `${cache}wikidata/cities.json`,
   wikidataLakes: `${cache}wikidata/lakes.json`,
   wikidataRivers: `${cache}wikidata/rivers.json`,
+  wikidataMemberships: `${cache}wikidata/memberships.json`,
   naturalEarthRivers: ['ne_10m_rivers_lake_centerlines', 'ne_10m_rivers_europe', 'ne_10m_rivers_north_america']
     .map(name => `${cache}naturalearth/${name}.geojson`),
   religionZip: `${cache}pew/religious-composition.zip`,

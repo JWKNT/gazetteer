@@ -2,8 +2,10 @@
 
 A turnable globe of the world’s countries and territories at
 [jehlp.net/gazetteer](https://jehlp.net/gazetteer/). Select a country to see its ten most populous
-cities and its capital, its highest and lowest points, its largest lake and longest river, its five
-largest exports, its GDP, its official languages, its main religion and its deadliest natural disaster. The page uses the shared [jehlp.net site theme](https://jehlp.net/site-theme/).
+cities and its capital, its government type, independence date and former names, its highest and
+lowest points, its largest lake and longest river, its five largest exports, its GDP, its official
+languages, its main religion, its deadliest natural disaster and its memberships of major
+international organizations. The page uses the shared [jehlp.net site theme](https://jehlp.net/site-theme/).
 
 ## Sources
 
@@ -25,6 +27,8 @@ largest exports, its GDP, its official languages, its main religion and its dead
 | Rivers and their lengths | Wikidata | CC0 |
 | River lines | Natural Earth rivers and lake centerlines, 1:10m, with the Europe and North America supplements | Public domain |
 | Disaster names | Wikipedia article titles and [GLIDE](https://glidenumber.net/) records, reviewed by hand | — |
+| Government type, independence, former names | The World Factbook, with reviewed changes | Public domain |
+| Memberships | The World Factbook and Wikidata, checked against the organizations' member lists | Public domain, CC0 |
 
 The CIA stopped The World Factbook in February 2026. The `factbook.json` mirror keeps its final edition.
 
@@ -66,6 +70,16 @@ The CIA stopped The World Factbook in February 2026. The `factbook.json` mirror 
   a country that the line passes through or runs along. The longest such river of a country is its
   longest river, at its full Wikidata length. A country without a line gets its longest Wikidata
   river, which the globe does not draw. `data/curated/rivers.json` holds reviewed choices.
+- **Government and independence.** The Factbook government type, without the names of
+  legislatures. The independence field gives the first date, or for a state that never became
+  independent from another, its founding. The earliest of the Factbook's "notable earlier dates"
+  is a second line. `data/curated/government.json` gives the reviewed choices, such as the
+  founding dates of France and the United Kingdom, military governments that the Factbook does
+  not show, and Palestine, which has no Factbook entry.
+- **Memberships.** The 32 organizations in `tools/lib/organizations.mjs`. A member in the Factbook
+  (January 2026) or in Wikidata counts, unless Wikidata gives an end date. Observers, partners and
+  associate members do not count. Suspended members still count. `data/curated/organizations.json`
+  holds the corrections, each with its reason.
 - **Symbols.** A highest or lowest point gets a position when Wikidata states the same point for
   the country, or when a place with its name lies in the country. Lake outlines join Natural Earth
   to the lake by Wikidata ID, then by name near the country. Other lakes get a dot. The capital's
